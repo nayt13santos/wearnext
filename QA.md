@@ -2,7 +2,7 @@
 
 ## Passed locally
 
-- 22 automated tests: outfit generation, locks, rotation boundaries, shoe/accessory exceptions, laundry/archive exclusions, purchase scoring, backend authentication, validation, safe error responses, upload idempotency, protected photo access, wear/undo history, connection transport, and preservation of live setup URLs.
+- 37 automated tests: outfit generation, locks, rotation boundaries, shoe/accessory exceptions, laundry/archive exclusions, purchase scoring, backend authentication, validation, safe error responses, upload idempotency, protected photo access, wear/undo history, connection transport, preservation of live setup URLs, separate gallery/camera controls, cancellation, disabled controls, color sampling, upload-response photo reuse, close/reopen during processing, stale processing failures, failed batch retry/skip, and cloud-save retry preservation.
 - TypeScript validation and production build.
 - Dependency audit after updating Vite: zero reported vulnerabilities.
 - Original inventory app and earlier prototype left unchanged.
@@ -22,3 +22,11 @@
 - Visual desktop/mobile browser check and Add to Home Screen verification.
 
 These are not represented as completed by the mocked test suite.
+
+## Camera and upload changes (September 28, 2026)
+
+- Dedicated rear-camera input (`image/*`, `capture=environment`, single image), separate from multi-select wardrobe gallery input. Purchase gallery remains single-image.
+- Browser: camera input opened a single-file chooser on desktop and processed the public sample image. A 390px-wide screenshot verified both actions are visible and readable. Physical iPhone/Android camera capture remains unverified.
+- Saving now uses the authoritative state returned by upload instead of issuing another state request, and seeds the session-only photo cache with the uploaded display image instead of downloading it again.
+- Color sampling uses a linear nearest-swatch search. A local synthetic 1200×1200 benchmark (five runs) averaged 189ms before and 9ms after with the same color. This is not an end-to-end phone or Google upload benchmark.
+- Independent read-only Bugbot-style review: no introduced regressions identified; two pre-existing editor bugs found. Both fixed after user approval: opening resets processing state and stale callbacks cannot overwrite a new session; failed batch items remain available for explicit Retry/Skip, with the prior saved preview cleared. Five new editor regression tests cover these transitions and cloud-save retry. The independent review ran once before these fixes; subsequent verification is the regression suite and build, not a second review.

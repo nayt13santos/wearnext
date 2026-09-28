@@ -9,7 +9,12 @@ export async function jsonRequest<T=State>(url:string,options?:RequestInit):Prom
     const form=options?.body as FormData,photo=form.get('photo') as Blob,original=form.get('original') as Blob;
     // FormData wraps Blobs in Files. The stable operation id is supplied by the caller.
     const id=String(form.get('id')||crypto.randomUUID());
-    return apiRequest<T>('upload',{id,data:JSON.parse(String(form.get('data'))),photo:await toBase64(photo),original:await toBase64(original)});
+    const [photoData,originalData]=await Promise.all([toBase64(photo),toBase64(original)]);
+    const result=await apiRequest<T>('upload',{id,data:JSON.parse(String(form.get('data'))),photo:photoData,original:originalData});
+    // The server has confirmed the save. Reuse this exact display image for this
+    // session instead of immediately downloading it back from private Drive.
+    photos.set(id,Promise.resolve('data:image/jpeg;base64,'+photoData));
+    return result;
   }
   if(url!=='/api/wardrobe')throw new Error('Unknown app request.');
   if(!options?.body)return apiRequest<T>('state');

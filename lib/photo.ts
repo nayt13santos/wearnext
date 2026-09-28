@@ -1,6 +1,5 @@
-import {colors} from './wardrobe';
+import {suggestPhotoColor} from './photo-colors';
 export type PhotoResult={blob:Blob;original:Blob;url:string;color:string;fingerprint:string};
-const swatches:Record<string,number[]>={White:[235,235,235],Black:[30,30,30],Grey:[130,130,130],Navy:[34,47,74],Blue:[48,99,184],Green:[77,111,71],Beige:[207,188,151],Brown:[114,76,45],Red:[188,47,49],Pink:[221,140,161],Purple:[124,75,155],Yellow:[222,198,65],Orange:[222,129,51],Multicolor:[130,130,130]};
 export async function processPhoto(file:Blob,{clean=false,rotation=0,zoom=1}:{clean?:boolean;rotation?:number;zoom?:number}={}):Promise<PhotoResult>{
  if(file.size>20*1024*1024)throw new Error('Choose a photo under 20 MB.');
  let bitmap:ImageBitmap;try{bitmap=await createImageBitmap(file);}catch{throw new Error('This photo cannot be opened. Use JPG, PNG or WebP; export HEIC as JPG first.');}
@@ -15,8 +14,7 @@ export async function processPhoto(file:Blob,{clean=false,rotation=0,zoom=1}:{cl
  while(head<tail){const i=queue[head++];d[i*4+3]=0;if(i%W)push(i-1);if(i%W<W-1)push(i+1);push(i-W);push(i+W);}
  ctx.putImageData(data,0,0);
  }
- const bins:Record<string,number>={};for(let y=Math.round(H*.2);y<H*.8;y+=6)for(let x=Math.round(W*.2);x<W*.8;x+=6){const i=(y*W+x)*4;if(d[i+3]<128)continue;const closest=colors.filter(c=>c!=='Multicolor').sort((a,b)=>Math.hypot(...swatches[a].map((v,j)=>v-d[i+j]))-Math.hypot(...swatches[b].map((v,j)=>v-d[i+j])))[0];bins[closest]=(bins[closest]||0)+1;}
- const color=Object.keys(bins).sort((a,b)=>bins[b]-bins[a])[0]||'Grey';
+ const color=suggestPhotoColor(d,W,H);
  const out=document.createElement('canvas');out.width=900;out.height=900;const o=out.getContext('2d')!;o.fillStyle='white';o.fillRect(0,0,900,900);const fit=Math.min(800/W,800/H)*zoom;o.drawImage(canvas,(900-W*fit)/2,(900-H*fit)/2,W*fit,H*fit);
  const blob=await new Promise<Blob>((resolve,reject)=>out.toBlob(b=>b?resolve(b):reject(new Error('Photo processing failed.')),'image/jpeg',.9));
  const fingerprint=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',await original.arrayBuffer()))).map(b=>b.toString(16).padStart(2,'0')).join('');
