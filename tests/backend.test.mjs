@@ -62,3 +62,9 @@ test('preferences validate boundary values and spreadsheet formula prefixes are 
   assert.equal(f.context.safeCell_('=IMPORTXML("bad")'),'\'=IMPORTXML("bad")');assert.equal(f.context.safeCell_('+1'),'\'+1');assert.equal(f.context.safeCell_(0),0);
 });
 test('raw Google errors stay private',()=>{const f=fixture();f.failUploads();const response=f.request('upload',{id:id(1),data:piece(1),photo:'/9j/2Q==',original:'/9j/2Q=='});assert.equal(response.ok,false);assert.equal(JSON.stringify(response).includes('private diagnostic'),false);});
+test('setup preserves a live connection and never supplies an editor-only dev URL',()=>{
+  const f=fixture(),live='https://script.google.com/macros/s/test-deployment/exec',dev='https://script.google.com/macros/s/test-dev/dev';
+  assert.equal(f.context.liveApiUrl_(live,dev),live);
+  assert.equal(f.context.liveApiUrl_('',live),live);
+  for(const value of ['',dev,live+'?token=secret','https://other.example/exec'])assert.equal(f.context.liveApiUrl_(value,dev),'Copy the Web app /exec URL from Deploy > Manage deployments.');
+});

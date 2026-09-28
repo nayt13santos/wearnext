@@ -44,7 +44,10 @@ function setupWearNext() {
     upsertSetting_('Setup','owner',owner,'Use this personal Google account for setup.');
     upsertSetting_('Setup','photos','https://drive.google.com/drive/folders/'+folder,'Private folder. Do not enable link sharing.');
     upsertSetting_('Setup','app','https://nayt13santos.github.io/wearnext/','Open in your phone browser, then Add to Home Screen.');
-    upsertSetting_('Setup','api_url',ScriptApp.getService().getUrl()||'Deploy as a web app and paste its /exec URL in the phone.','Deploy: execute as Me, access Anyone. Every data request still requires the private key.');
+    // Editor runs can return a /dev URL. Preserve a configured live deployment.
+    const savedApi=rows_('Setup').find(row=>row.setting==='api_url');
+    const liveUrl=liveApiUrl_(savedApi&&savedApi.value,ScriptApp.getService().getUrl());
+    upsertSetting_('Setup','api_url',liveUrl,'Deploy: execute as Me, access Anyone. Every data request still requires the private key.');
     SpreadsheetApp.flush();
     console.log('Ready. Open your private Setup tab: '+book.getUrl());
     return {spreadsheet:book.getUrl(),photos:'https://drive.google.com/drive/folders/'+folder,owner:owner};
@@ -59,6 +62,10 @@ function rotateConnectionKey() {
   try{const token=(Utilities.getUuid()+Utilities.getUuid()).replace(/-/g,'');props.setProperty('CONNECTION_KEY',token);upsertSetting_('Setup','connection_key',token,'Key rotated. Reconnect each device.');}finally{lock.releaseLock();}
 }
 
+function liveApiUrl_(saved,service){
+  const valid=value=>typeof value==='string'&&/^https:\/\/script\.google\.com\/macros\/s\/[A-Za-z0-9_-]+\/exec$/.test(value);
+  return valid(saved)?saved:valid(service)?service:'Copy the Web app /exec URL from Deploy > Manage deployments.';
+}
 function doGet(){return json_({ok:true,data:{app:'WearNext',version:VERSION}});}
 function doPost(e) {
   let lock;
