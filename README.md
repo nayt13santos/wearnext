@@ -6,6 +6,8 @@ A personal wardrobe web app. GitHub Pages hosts the interface. A separate Google
 
 - Upload clothing photos individually or review a batch one item at a time.
 - Rotate, resize, zoom/crop, and optionally clean a simple background on the device. Color is suggested from pixels; confirm the other garment details yourself.
+- Find possible seller photos with optional SerpApi Google Lens search. Preview and confirm the exact garment/color before replacing the display photo. The resized camera original remains the saved backup, and source links are retained in the Sheet.
+- Use Google Lens manually and upload a downloaded seller photo without any search key. Restore the original before saving with one button.
 - Generate outfits for a purpose, temperature, rain and indoor air conditioning. Lock favorites and swap available alternatives.
 - Rest each clothing piece for 30 days after recording it as worn. Shoes/accessories can repeat. Adjust the interval from 0 to 90 days.
 - Exclude laundry and archived clothing. Undo mistaken wears without deleting audit history.
@@ -32,6 +34,18 @@ The GitHub repository and built app contain code and fictional sample clothes on
 Anyone with the connection key and backend link can access this single personal wardrobe. It is a shared-secret connection, not per-person Google sign-in. Use trusted devices. To revoke all devices, run `rotateConnectionKey` in the private script editor and reconnect with the new key. Disconnecting one device removes its local key but does not revoke another device.
 
 Private photos are fetched through the authenticated backend by wardrobe ID, not public Drive image URLs. The service worker never caches records, keys or private photos. The weather provider receives only the selected city/coordinates, not clothing data or the connection key. Photo cleanup, outfit generation and scoring run locally.
+
+## Optional seller-photo search
+
+In **Preferences → Seller-photo search**, connect a SerpApi key from your own account. It is validated against SerpApi and stored only in Apps Script Properties (`SERPAPI_KEY`), never returned to the browser or included in public source. There is no AI account dependency. Use the provider's free plan if you want to avoid a subscription; WearNext never changes billing settings.
+
+Choosing **Find seller photos** sends an EXIF-free JPEG under 500 KB to SerpApi's Image API, then searches Google Lens using the returned image ID. This intentionally shares that photo with the search providers and is subject to their retention policies. The rest of the wardrobe, connection key, and original Drive file stay private. Results are possible matches, not verified product identities. Select a result, preview its downloaded image, and confirm the design and color before using it.
+
+WearNext caps attempts at 250 per Manila calendar month, with a short result cache to avoid repeat searches. Failed provider attempts may consume the local limit; the provider's own account allowance can differ. The manual Lens + seller-photo upload path remains available without a key or when a provider fails. Lookup failures never replace the current clothing photo. Imports accept only short-lived result IDs, validate public image URLs/DNS and redirects, and verify supported image bytes. Some sellers block downloads; save their image and use the manual upload in that case.
+
+The feature applies while adding a new garment or previewing a purchase. Existing saved garments retain their photos. The next seller-photo save adds two optional source columns to the existing Wardrobe sheet without rerunning setup or replacing data. Updating the same Apps Script deployment is required for the new authenticated `sellerStatus`, `sellerKey`, `sellerSearch`, and `sellerImage` actions.
+
+References: [SerpApi image upload](https://serpapi.com/google-lens-upload-an-image), [Google Lens results](https://serpapi.com/google-lens-api), [manual Google image search](https://support.google.com/websearch/answer/1325808).
 
 The source photo stored by the app is a resized JPEG, not an archival original. Keep your original camera files if needed. Apps Script/Drive quotas apply; large wardrobes can load more slowly than a dedicated database/photo service. Image downloads are lazy and concurrency-limited. Do not use this as a multi-tenant public service without replacing the personal-key access model.
 

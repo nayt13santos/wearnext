@@ -32,10 +32,10 @@ function editor(processPhoto){
       old?.cleanup?.();hooks[i]={deps,cleanup:callback()};
     });
   }};
-  const modules={react,'./photo-picker':{default:'PhotoPicker'},
+  const modules={react,'./photo-picker':{default:'PhotoPicker'},'./seller-photo-search':{default:'SellerPhotoSearch'},
     '@/lib/photo':{processPhoto},'@/lib/client':{},'@/lib/wardrobe':{categories:[],colors:[]}};
   const exports={};
-  runInNewContext(compiled,{exports,URL:{revokeObjectURL:url=>revoked.push(url)},
+  runInNewContext(compiled,{exports,File,URL:{revokeObjectURL:url=>revoked.push(url)},
     require:id=>modules[id]||(id.startsWith('@/components/')?new Proxy({}, {get:(_,key)=>String(key)}):require(id))});
   function render(){let count=0;do{dirty=false;index=0;tree=exports.default(props);
     effects.splice(0).forEach(fn=>fn());if(++count>20)throw Error('Render loop');}while(dirty);return tree;}
@@ -107,4 +107,30 @@ test('a failed cloud save preserves the same photo and remaining batch for retry
   e.saveButton().props.onClick();await e.settle();
   e.saveButton().props.onClick();await e.settle();
   assert.deepEqual(e.saved,['A','B']);
+});
+
+test('seller selection keeps the camera original and confirmed details through crop and save',async()=>{
+  const e=editor(async file=>result(file.name?file:{name:'seller.jpg'}));let savedPhoto,savedPiece;
+  e.props.onSave=async(piece,photo)=>{savedPhoto=photo;savedPiece=piece;};
+  e.picker().props.onChoose([{name:'camera.jpg'}]);await e.settle();
+  const search=()=>e.nodes().find(n=>n.type==='SellerPhotoSearch');
+  const original=search().props.original;
+  await search().props.onUse(new Blob(['studio']),{label:'The seller',url:'https://shop.example.com/item'});await e.settle();
+  assert.equal(e.picker().props.children.props.piece.name,'camera');
+  assert.equal(e.picker().props.children.props.piece.photoSourceLabel,'The seller');
+  e.button('Rotate').props.onClick();await e.settle();
+  e.saveButton().props.onClick();await e.settle();
+  assert.equal(savedPhoto.original,original);assert.equal(savedPhoto.fingerprint,'camera.jpg');
+  assert.equal(savedPiece.photoSourceUrl,'https://shop.example.com/item');
+});
+
+test('a pending seller operation blocks save, and restoring original clears seller attribution',async()=>{
+  const e=editor(async file=>result(file.name?file:{name:'seller.jpg'}));let savedPiece;
+  e.props.onSave=async piece=>{savedPiece=piece;};
+  e.picker().props.onChoose([{name:'camera.jpg'}]);await e.settle();
+  const search=e.nodes().find(n=>n.type==='SellerPhotoSearch');
+  search.props.onBusy(true);e.render();assert.equal(e.saveButton().props.disabled,true);assert.equal(e.picker().props.disabled,true);
+  search.props.onBusy(false);await search.props.onUse(new Blob(['studio']),{label:'Seller',url:''});await e.settle();
+  e.button('Use my original photo').props.onClick();await e.settle();
+  e.saveButton().props.onClick();await e.settle();assert.equal(savedPiece.photoSourceLabel,'');assert.equal(savedPiece.image,'blob:camera.jpg');
 });

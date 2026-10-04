@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import vm from 'node:vm';
 import {createHash} from 'node:crypto';
-const source=readFileSync(new URL('../apps-script/Code.gs',import.meta.url),'utf8');
+const source=readFileSync(new URL('../apps-script/Code.gs',import.meta.url),'utf8')+'\n'+readFileSync(new URL('../apps-script/SellerPhotos.gs',import.meta.url),'utf8');
 const key='a'.repeat(64),id=n=>`00000000-0000-4000-8000-${String(n).padStart(12,'0')}`;
 const piece=(n,category='Top')=>({id:id(n),name:'Test clothing',category,color:'White',style:'Versatile',warmth:1,pattern:'Solid',material:'Cotton',waterproof:false,laundry:false,archived:false,favorite:false,photo_file_id:'private-'+n,fingerprint:'test'});
 function fixture(){
@@ -18,7 +18,7 @@ function fixture(){
   return {context,tables,request,get files(){return files;},get locks(){return locks;},get downloads(){return downloads;},failUploads(){failUpload=true;}};
 }
 test('every private action rejects missing/wrong keys before data access',()=>{
-  const f=fixture();for(const action of ['state','upload','photo','piece','wear','undo','settings']){assert.equal(f.request(action,{},'').ok,false);assert.equal(f.request(action,{},'b'.repeat(64)).ok,false);}assert.equal(f.files,0);assert.equal(f.locks,0);assert.equal(f.downloads,0);
+  const f=fixture();for(const action of ['state','upload','photo','piece','wear','undo','settings','sellerStatus','sellerKey','sellerSearch','sellerImage']){assert.equal(f.request(action,{},'').ok,false);assert.equal(f.request(action,{},'b'.repeat(64)).ok,false);}assert.equal(f.files,0);assert.equal(f.locks,0);assert.equal(f.downloads,0);
   assert.equal(f.context.doGet().data.app,'WearNext');assert.equal(JSON.stringify(f.context.doGet()).includes(key),false);
 });
 test('malformed bodies and arbitrary method dispatch are rejected',()=>{
@@ -67,4 +67,15 @@ test('setup preserves a live connection and never supplies an editor-only dev UR
   assert.equal(f.context.liveApiUrl_(live,dev),live);
   assert.equal(f.context.liveApiUrl_('',live),live);
   for(const value of ['',dev,live+'?token=secret','https://other.example/exec'])assert.equal(f.context.liveApiUrl_(value,dev),'Copy the Web app /exec URL from Deploy > Manage deployments.');
+});
+
+test('seller-photo saves keep the original fingerprint and retain attribution through ordinary edits',()=>{
+  const f=fixture();let migrations=0;f.context.ensurePhotoSourceColumns_=()=>{migrations++;};
+  const data={...piece(1),photoSourceUrl:'https://shop.example.com/item',photoSourceLabel:'Example store'};
+  assert.equal(f.request('upload',{id:id(1),data,photo:'/9gAAP/Z',original:'/9j/2Q=='}).ok,true);
+  assert.equal(migrations,1);const row=f.tables.Wardrobe[0];assert.equal(row.photo_source_url,data.photoSourceUrl);assert.equal(row.photo_source_label,'Example store');
+  assert.equal(row.fingerprint,createHash('sha256').update(Buffer.from('/9j/2Q==','base64')).digest('hex'));
+  assert.notEqual(row.photo_file_id,row.original_file_id);
+  assert.equal(f.request('piece',{id:id(1),data:{...data,name:'Updated name'}}).ok,true);
+  assert.equal(f.request('state').data.pieces[0].photoSourceLabel,'Example store');
 });

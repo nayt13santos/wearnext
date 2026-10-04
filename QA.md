@@ -23,6 +23,15 @@
 
 These are not represented as completed by the mocked test suite.
 
+## Seller photos (October 4, 2026)
+
+- 48 tests pass, including authenticated search/configuration, missing key, image upload/search response handling, short-lived result cache, monthly cap, image size validation, private URL/DNS rejection, redirect revalidation, provider-error redaction, seller provenance persistence, and keeping the camera original through seller replacement and crop/rotation.
+- TypeScript validation and production build pass. No dependencies or OAuth scopes added.
+- Browser: uploaded the bundled fictional catalog image in the purchase preview, uploaded it again as a seller-image stand-in, confirmed it, and verified the edited garment name remained intact. No wardrobe data was saved during this check.
+- Browser: inspected the seller-photo section at 390px width; controls and explanatory text fit without horizontal clipping.
+- Live SerpApi search and real retailer image retrieval require an owner's valid search key and remain unverified. The automated tests mock those providers. Account-free Google Lens navigation and local seller-photo uploads remain available before setup.
+- A real seller-photo save/reload to the private Google Sheet/Drive has not been performed during this update; the original-preservation and source-column behavior is covered by mocked tests.
+
 ## Camera and upload changes (September 28, 2026)
 
 - Dedicated rear-camera input (`image/*`, `capture=environment`, single image), separate from multi-select wardrobe gallery input. Purchase gallery remains single-image.
