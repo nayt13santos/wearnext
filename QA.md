@@ -32,6 +32,13 @@ These are not represented as completed by the mocked test suite.
 - Live SerpApi search and real retailer image retrieval require an owner's valid search key and remain unverified. The automated tests mock those providers. Account-free Google Lens navigation and local seller-photo uploads remain available before setup.
 - A real seller-photo save/reload to the private Google Sheet/Drive has not been performed during this update; the original-preservation and source-column behavior is covered by mocked tests.
 
+## Seller search setup fix (October 4, 2026)
+
+- 54 tests pass. Added coverage for opening setup when a key is missing, retaining the uploaded original after setup, retrying a failed connection check, disconnected preview guidance, monthly allowance resets, and key validation success/failure callbacks.
+- TypeScript validation and production build pass.
+- Browser: uploaded the bundled sample in purchase preview and clicked Find seller photos. It remained enabled and opened inline setup guidance without losing the photo or clothing details.
+- Automatic search still needs the owner's SerpApi key. Live provider search remains unverified until that key is connected.
+
 ## Camera and upload changes (September 28, 2026)
 
 - Dedicated rear-camera input (`image/*`, `capture=environment`, single image), separate from multi-select wardrobe gallery input. Purchase gallery remains single-image.
