@@ -2,7 +2,7 @@
  * Run setupWearNext once in the editor using your PERSONAL Google account.
  * Never paste the connection key into source code or a public repository.
  */
-const VERSION = '1.1.0';
+const VERSION = '1.2.0';
 const DEFAULTS = {cooldown:30,city:'Marikina',latitude:14.65,longitude:121.1,budget:1500,currency:'PHP'};
 const CATEGORIES = ['Top','Bottom','One-piece','Shoes','Layer','Accessory'];
 const OCCASIONS = ['Everyday','Office','Dinner out','Formal event','Workout','Travel'];
@@ -76,10 +76,6 @@ function doPost(e) {
     const expected=PropertiesService.getScriptProperties().getProperty('CONNECTION_KEY');
     if(!expected||!constantEqual_(body&&body.token,expected))fail_('Connection key is missing or incorrect. Check your private Setup sheet.');
     const action=body.action,payload=body.payload||{};
-    if(action==='sellerStatus')return json_({ok:true,data:sellerStatus_()});
-    if(action==='sellerKey')return json_({ok:true,data:sellerKey_(payload)});
-    if(action==='sellerSearch')return json_({ok:true,data:sellerSearch_(payload)});
-    if(action==='sellerImage')return json_({ok:true,data:sellerImage_(payload)});
     if(action==='photo')return json_({ok:true,data:photo_(payload)});
     if(!['state','upload','piece','wear','undo','settings'].includes(action))fail_('Unknown action.');
     lock=LockService.getScriptLock();if(!lock.tryLock(25000))fail_('Another save is in progress. Refresh and try again.');
@@ -107,7 +103,7 @@ function write_(name,row,data){const sheet=sheet_(name),headers=sheet.getRange(1
 function append_(name,data){write_(name,sheet_(name).getLastRow()+1,data);}
 function upsertSetting_(tab,key,value,notes){const row=rows_(tab).find(r=>r.setting===key);const data={setting:key,value:value,notes:notes||''};if(row)write_(tab,row._row,data);else append_(tab,data);}
 function bool_(value){return value===true||value==='TRUE'||value==='true';}
-function piece_(row){return {id:row.id,name:row.name,category:row.category,color:row.color,style:row.style,warmth:Number(row.warmth),pattern:row.pattern,material:row.material,waterproof:bool_(row.waterproof),laundry:bool_(row.laundry),archived:bool_(row.archived),favorite:bool_(row.favorite),fingerprint:row.fingerprint,image:'wardrobe-photo:'+row.id,photoSourceUrl:row.photo_source_url||'',photoSourceLabel:row.photo_source_label||''};}
+function piece_(row){return {id:row.id,name:row.name,category:row.category,color:row.color,style:row.style,warmth:Number(row.warmth),pattern:row.pattern,material:row.material,waterproof:bool_(row.waterproof),laundry:bool_(row.laundry),archived:bool_(row.archived),favorite:bool_(row.favorite),fingerprint:row.fingerprint,image:'wardrobe-photo:'+row.id};}
 function state_(){
   const preferences=Object.assign({},DEFAULTS);rows_('Preferences').forEach(row=>{if(Object.prototype.hasOwnProperty.call(DEFAULTS,row.setting))preferences[row.setting]=typeof DEFAULTS[row.setting]==='number'?Number(row.value):String(row.value);});
   return {pieces:rows_('Wardrobe').map(piece_).reverse(),wears:rows_('WearHistory').filter(r=>!bool_(r.voided)).map(r=>({id:r.id,day:String(r.day),occasion:r.occasion,temperature:Number(r.temperature),items:JSON.parse(r.items_json)})).sort((a,b)=>b.day.localeCompare(a.day)),preferences:validatePreferences_(preferences)};
@@ -129,7 +125,6 @@ function jpeg_(base64){
 }
 function upload_(p){
   const id=id_(p.id),data=validatePiece_(p.data),bytes=jpeg_(p.photo),original=jpeg_(p.original);
-  const photoSource=photoSourceFields_(p.data);
   const fingerprint=Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256,original).map(b=>('0'+(b&255).toString(16)).slice(-2)).join('');
   const existing=rows_('Wardrobe').find(r=>r.id===id);
   if(existing){if(existing.fingerprint!==fingerprint)fail_('That upload reference is already in use. Reopen the photo and try again.');return;}
@@ -138,8 +133,7 @@ function upload_(p){
   try{
     const photo=Drive.Files.create({name:id+'.jpg',parents:[folder]},Utilities.newBlob(bytes,'image/jpeg',id+'.jpg'),{fields:'id'});created.push(photo.id);
     const source=Drive.Files.create({name:id+'-source.jpg',parents:[folder]},Utilities.newBlob(original,'image/jpeg',id+'-source.jpg'),{fields:'id'});created.push(source.id);
-    if(photoSource.photo_source_label||photoSource.photo_source_url)ensurePhotoSourceColumns_();
-    const now=new Date().toISOString();append_('Wardrobe',Object.assign(data,photoSource,{id:id,photo_file_id:photo.id,original_file_id:source.id,fingerprint:fingerprint,created_at:now,updated_at:now}));
+    const now=new Date().toISOString();append_('Wardrobe',Object.assign(data,{id:id,photo_file_id:photo.id,original_file_id:source.id,fingerprint:fingerprint,created_at:now,updated_at:now}));
   }catch(error){
     // Only newly created orphan files are sent to trash; never touch unrelated Drive files.
     if(!rows_('Wardrobe').some(r=>r.id===id))created.forEach(file=>{try{Drive.Files.update({trashed:true},file);}catch(_){}});

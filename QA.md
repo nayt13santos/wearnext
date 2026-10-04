@@ -23,21 +23,12 @@
 
 These are not represented as completed by the mocked test suite.
 
-## Seller photos (October 4, 2026)
+## Seller-photo feature removed (October 4, 2026)
 
-- 48 tests pass, including authenticated search/configuration, missing key, image upload/search response handling, short-lived result cache, monthly cap, image size validation, private URL/DNS rejection, redirect revalidation, provider-error redaction, seller provenance persistence, and keeping the camera original through seller replacement and crop/rotation.
-- TypeScript validation and production build pass. No dependencies or OAuth scopes added.
-- Browser: uploaded the bundled fictional catalog image in the purchase preview, uploaded it again as a seller-image stand-in, confirmed it, and verified the edited garment name remained intact. No wardrobe data was saved during this check.
-- Browser: inspected the seller-photo section at 390px width; controls and explanatory text fit without horizontal clipping.
-- Live SerpApi search and real retailer image retrieval require an owner's valid search key and remain unverified. The automated tests mock those providers. Account-free Google Lens navigation and local seller-photo uploads remain available before setup.
-- A real seller-photo save/reload to the private Google Sheet/Drive has not been performed during this update; the original-preservation and source-column behavior is covered by mocked tests.
-
-## Seller search setup fix (October 4, 2026)
-
-- 54 tests pass. Added coverage for opening setup when a key is missing, retaining the uploaded original after setup, retrying a failed connection check, disconnected preview guidance, monthly allowance resets, and key validation success/failure callbacks.
-- TypeScript validation and production build pass.
-- Browser: uploaded the bundled sample in purchase preview and clicked Find seller photos. It remained enabled and opened inline setup guidance without losing the photo or clothing details.
-- Automatic search still needs the owner's SerpApi key. Live provider search remains unverified until that key is connected.
+- Removed automatic seller-photo search, the Google Lens/import panel, and search-key setup at the owner's request.
+- Removed the backend search/configuration/image-fetch actions. Existing wardrobe rows and private photos remain intact; editing existing rows preserves any extra source columns already present in the Sheet.
+- Regular uploads, camera capture, rotate/crop, optional plain-background cleanup, and batch retry/skip remain available.
+- 39 tests, TypeScript validation, and the production build pass.
 
 ## Camera and upload changes (September 28, 2026)
 
