@@ -1,5 +1,12 @@
 # Verification
 
+## Photo category recognition — October 19, 2026
+
+- 53 automated tests pass. Added category score selection and editor regressions for manual overrides, slow/stale detection, model failures, unclear photos and independent batch categories. TypeScript and production build pass.
+- Exported the original MIT-licensed CLIP ViT-B/32 image encoder with fixed clothing labels and int8 weights. Checked six fictional catalogue crops: tee, trousers, shorts, shoes and overshirt were clear matches; the ambiguous shirt/overshirt crop correctly required a manual choice. These examples are smoke checks, not an accuracy benchmark.
+- Verified the production build in Chrome using a local shoe photo: the real worker/model loaded, suggested Shoes and enabled the form. The test photo remained in an unsaved preview. Physical phone performance is unverified; unavailable recognition permits manual selection.
+- Reviewed the owner’s saved wardrobe photos through the connected app and corrected five misclassified categories. No photos, keys or private record identifiers are stored in this repository.
+
 ## Generate Outfit feedback — October 19, 2026
 
 - Reproduced a phone layout issue: Generate updated the result below the viewport while the button and visible page appeared unchanged.

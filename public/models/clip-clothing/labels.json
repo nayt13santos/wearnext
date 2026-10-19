@@ -1,0 +1,190 @@
+[
+  {
+    "category": "Top",
+    "label": "a t-shirt"
+  },
+  {
+    "category": "Top",
+    "label": "a polo shirt"
+  },
+  {
+    "category": "Top",
+    "label": "a button-up shirt"
+  },
+  {
+    "category": "Top",
+    "label": "a blouse"
+  },
+  {
+    "category": "Top",
+    "label": "a tank top"
+  },
+  {
+    "category": "Top",
+    "label": "a sweater"
+  },
+  {
+    "category": "Top",
+    "label": "a sweatshirt"
+  },
+  {
+    "category": "Top",
+    "label": "a sports jersey"
+  },
+  {
+    "category": "Bottom",
+    "label": "trousers"
+  },
+  {
+    "category": "Bottom",
+    "label": "jeans"
+  },
+  {
+    "category": "Bottom",
+    "label": "shorts"
+  },
+  {
+    "category": "Bottom",
+    "label": "a skirt"
+  },
+  {
+    "category": "Bottom",
+    "label": "leggings"
+  },
+  {
+    "category": "Bottom",
+    "label": "jogger pants"
+  },
+  {
+    "category": "Bottom",
+    "label": "chino pants"
+  },
+  {
+    "category": "Shoes",
+    "label": "sneakers"
+  },
+  {
+    "category": "Shoes",
+    "label": "dress shoes"
+  },
+  {
+    "category": "Shoes",
+    "label": "boots"
+  },
+  {
+    "category": "Shoes",
+    "label": "sandals"
+  },
+  {
+    "category": "Shoes",
+    "label": "slippers"
+  },
+  {
+    "category": "Shoes",
+    "label": "loafers"
+  },
+  {
+    "category": "Shoes",
+    "label": "high heels"
+  },
+  {
+    "category": "One-piece",
+    "label": "a dress"
+  },
+  {
+    "category": "One-piece",
+    "label": "a jumpsuit"
+  },
+  {
+    "category": "One-piece",
+    "label": "a romper"
+  },
+  {
+    "category": "One-piece",
+    "label": "overalls"
+  },
+  {
+    "category": "Layer",
+    "label": "a jacket"
+  },
+  {
+    "category": "Layer",
+    "label": "a coat"
+  },
+  {
+    "category": "Layer",
+    "label": "a blazer"
+  },
+  {
+    "category": "Layer",
+    "label": "a cardigan"
+  },
+  {
+    "category": "Layer",
+    "label": "a zip-up hoodie"
+  },
+  {
+    "category": "Layer",
+    "label": "an overshirt"
+  },
+  {
+    "category": "Accessory",
+    "label": "a bag"
+  },
+  {
+    "category": "Accessory",
+    "label": "a hat"
+  },
+  {
+    "category": "Accessory",
+    "label": "a belt"
+  },
+  {
+    "category": "Accessory",
+    "label": "a scarf"
+  },
+  {
+    "category": "Accessory",
+    "label": "a wristwatch"
+  },
+  {
+    "category": "Accessory",
+    "label": "jewelry"
+  },
+  {
+    "category": "Accessory",
+    "label": "socks"
+  },
+  {
+    "category": "Accessory",
+    "label": "sunglasses"
+  },
+  {
+    "category": "Unknown",
+    "label": "several different garments in a complete outfit"
+  },
+  {
+    "category": "Unknown",
+    "label": "an empty background"
+  },
+  {
+    "category": "Unknown",
+    "label": "furniture"
+  },
+  {
+    "category": "Unknown",
+    "label": "food"
+  },
+  {
+    "category": "Unknown",
+    "label": "a household object"
+  },
+  {
+    "category": "Unknown",
+    "label": "an electronic device"
+  },
+  {
+    "category": "Unknown",
+    "label": "a landscape"
+  }
+]

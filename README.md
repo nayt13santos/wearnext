@@ -5,7 +5,7 @@ A personal wardrobe web app. GitHub Pages hosts the interface. A separate Google
 ## What it does
 
 - Upload clothing photos individually or review a batch one item at a time.
-- Rotate, resize, zoom/crop, and optionally clean a simple background on the device. Color is suggested from pixels; confirm the other garment details yourself.
+- Rotate, resize, zoom/crop, and optionally clean a simple background on the device. Category is suggested by an on-device image model and color from pixels. Unclear photos require a category selection; you can always override a suggestion. Confirm fabric and dress code yourself.
 - Generate outfits for a purpose, temperature, rain and indoor air conditioning. Lock favorites and swap available alternatives.
 - Rest each clothing piece for 30 days after recording it as worn. Shoes/accessories can repeat. Adjust the interval from 0 to 90 days.
 - Exclude laundry and archived clothing. Undo mistaken wears without deleting audit history.
@@ -31,7 +31,7 @@ The GitHub repository and built app contain code and fictional sample clothes on
 
 Anyone with the connection key and backend link can access this single personal wardrobe. It is a shared-secret connection, not per-person Google sign-in. Use trusted devices. To revoke all devices, run `rotateConnectionKey` in the private script editor and reconnect with the new key. Disconnecting one device removes its local key but does not revoke another device.
 
-Private photos are fetched through the authenticated backend by wardrobe ID, not public Drive image URLs. The service worker never caches records, keys or private photos. The weather provider receives only the selected city/coordinates, not clothing data or the connection key. Photo cleanup, outfit generation and scoring run locally.
+Private photos are fetched through the authenticated backend by wardrobe ID, not public Drive image URLs. The service worker never caches records, keys or private photos. The weather provider receives only the selected city/coordinates, not clothing data or the connection key. Photo cleanup, category recognition, outfit generation and scoring run locally. Recognition downloads a public 96 MB CLIP model and a WebAssembly runtime on first use and caches the weights when browser storage allows it. Photos are never sent to an AI service. Older/low-memory devices or unavailable downloads fall back to manual category selection.
 
 The source photo stored by the app is a resized JPEG, not an archival original. Keep your original camera files if needed. Apps Script/Drive quotas apply; large wardrobes can load more slowly than a dedicated database/photo service. Image downloads are lazy and concurrency-limited. Do not use this as a multi-tenant public service without replacing the personal-key access model.
 
@@ -49,5 +49,7 @@ npm run build
 The app uses the `/wearnext/` GitHub Pages path. Set GitHub Pages Source to **GitHub Actions**. The included workflow tests and builds before publishing. It needs no Google or AI credentials in Actions. Backend deployment is separate through the personal Apps Script project; keep updating the same deployment to preserve the phone's API URL.
 
 Tests use synthetic data and a mocked Google runtime; they never edit your real Sheet. Real-account authorization and a live upload/save/reload test are still required to verify a fresh deployment.
+
+The category model is derived from MIT-licensed OpenAI CLIP ViT-B/32. Its source, checksum, vocabulary, export steps and license are in `public/models/clip-clothing/` and `scripts/export-category-model.py`.
 
 Implementation references: [Google Apps Script web apps](https://developers.google.com/apps-script/guides/web), [Advanced Drive service](https://developers.google.com/apps-script/advanced/drive), [GitHub Pages workflows](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages).

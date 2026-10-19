@@ -8,7 +8,7 @@ Palette: canvas #F4F6F9, paper #FFFFFF, ink #182534, denim #234EDB, secondary #5
 
 User-confirmed rotation: each clothing piece rests 30 days after an actual wear; shoes and accessories can repeat. Adjustable 0–90 days. Laundry and archive always exclude items. No silent cooldown overrides.
 
-Purchase scorer: transparent rule-based compatibility and metadata similarity, not an AI claim. Category/style/pattern/material require user review. Color is suggested from image pixels. Resized source and processed display photos live in private Google Drive files; metadata and wear history live in Google Sheets.
+Purchase scorer: transparent rule-based compatibility and metadata similarity, not an AI claim. Category uses a locally hosted, quantized CLIP image encoder with fixed clothing prompts. Close category scores and weak/non-clothing matches require manual selection; predictions are suggestions, not calibrated probabilities. A worker keeps inference off the UI thread. Closing/changing photos or selecting a category prevents late predictions from overriding user input. Style/pattern/material require user review. Color is suggested from image pixels. Resized source and processed display photos live in private Google Drive files; metadata and wear history live in Google Sheets.
 
 Demo catalogue is fictional, generated during development. The demo never persists into the user's wardrobe. Asset public/demo-catalog.png is a 3×2 image atlas. No generative AI service is called by the app.
 

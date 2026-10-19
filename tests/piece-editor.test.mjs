@@ -18,7 +18,7 @@ function deferred(){let resolve,reject;const promise=new Promise((a,b)=>{resolve
 
 // A small hook harness exercises the actual component callbacks and effect
 // cleanup without adding a DOM dependency. Browser rendering is checked separately.
-function editor(processPhoto){
+function editor(processPhoto,recognizeCategory=async()=>({category:'Top',confidence:.9,label:'shirt'})){
   let index=0,dirty=false,tree,closed=0;
   const hooks=[],effects=[],saved=[],revoked=[];
   const props={open:true,onClose:()=>{closed++;},onSave:async piece=>{saved.push(piece.name);}};
@@ -33,9 +33,9 @@ function editor(processPhoto){
     });
   }};
   const modules={react,'./photo-picker':{default:'PhotoPicker'},
-    '@/lib/photo':{processPhoto},'@/lib/client':{},'@/lib/wardrobe':{categories:[],colors:[]}};
+    '@/lib/category-recognition':{recognizeCategory},'@/lib/photo':{processPhoto},'@/lib/client':{},'@/lib/wardrobe':{categories:[],colors:[]}};
   const exports={};
-  runInNewContext(compiled,{exports,URL:{revokeObjectURL:url=>revoked.push(url)},
+  runInNewContext(compiled,{exports,AbortController,URL:{revokeObjectURL:url=>revoked.push(url)},
     require:id=>modules[id]||(id.startsWith('@/components/')?new Proxy({}, {get:(_,key)=>String(key)}):require(id))});
   function render(){let count=0;do{dirty=false;index=0;tree=exports.default(props);
     effects.splice(0).forEach(fn=>fn());if(++count>20)throw Error('Render loop');}while(dirty);return tree;}
@@ -107,4 +107,51 @@ test('a failed cloud save preserves the same photo and remaining batch for retry
   e.saveButton().props.onClick();await e.settle();
   e.saveButton().props.onClick();await e.settle();
   assert.deepEqual(e.saved,['A','B']);
+});
+
+const category=e=>e.nodes().find(n=>n.props?.label==='Category');
+test('a new photo waits for recognition and saves the suggested shoe type',async()=>{
+ const pending=deferred(),e=editor(async file=>result(file),()=>pending.promise);let saved;
+ e.props.onSave=async piece=>{saved=piece;};
+ e.picker().props.onChoose([{name:'shoe.jpg'}]);await e.settle();
+ assert.equal(category(e).props.value,'');assert.equal(e.saveButton().props.disabled,true);
+ pending.resolve({category:'Shoes'});await e.settle();
+ assert.equal(category(e).props.value,'Shoes');
+ e.saveButton().props.onClick();await e.settle();assert.equal(saved.category,'Shoes');
+});
+test('a manual correction wins over a late recognition result',async()=>{
+ const pending=deferred(),e=editor(async file=>result(file),()=>pending.promise);
+ e.picker().props.onChoose([{name:'trousers.jpg'}]);await e.settle();
+ category(e).props.onChange('Bottom');pending.resolve({category:'Top'});await e.settle();
+ assert.equal(category(e).props.value,'Bottom');assert.equal(e.saveButton().props.disabled,false);
+});
+test('a category selected during photo processing is not replaced',async()=>{
+ const pending=deferred();let calls=0;
+ const e=editor(()=>pending.promise,async()=>{calls++;return {category:'Top'};});
+ e.picker().props.onChoose([{name:'pants.jpg'}]);category(e).props.onChange('Bottom');
+ pending.resolve(result({name:'pants.jpg'}));await e.settle();
+ assert.equal(category(e).props.value,'Bottom');assert.equal(calls,0);
+});
+test('uncertain recognition and model failure both allow manual categorization',async()=>{
+ for(const recognize of [async()=>({category:null}),async()=>{throw Error('Offline');}]){
+  const e=editor(async file=>result(file),recognize);
+  e.picker().props.onChoose([{name:'unknown.jpg'}]);await e.settle();
+  assert.equal(category(e).props.value,'');assert.equal(e.saveButton().props.disabled,true);
+  category(e).props.onChange('Layer');assert.equal(e.saveButton().props.disabled,false);
+ }
+});
+test('closing recognition cannot alter a newly opened editor',async()=>{
+ const pending=deferred(),e=editor(async file=>result(file),()=>pending.promise);
+ e.picker().props.onChoose([{name:'old.jpg'}]);await e.settle();
+ e.props.open=false;e.render();e.props.open=true;e.render();
+ pending.resolve({category:'Shoes'});await e.settle();
+ assert.equal(category(e).props.value,'');assert.equal(e.saveButton().props.disabled,true);
+});
+test('each batch photo gets its own category and a manual edit does not carry over',async()=>{
+ let calls=0;const e=editor(async file=>result(file),async()=>({category:++calls===1?'Shoes':'Bottom'}));
+ const types=[];e.props.onSave=async piece=>{types.push(piece.category);};
+ e.picker().props.onChoose([{name:'A.jpg'},{name:'B.jpg'}]);await e.settle();
+ category(e).props.onChange('Accessory');e.saveButton().props.onClick();await e.settle();
+ assert.equal(category(e).props.value,'Bottom');e.saveButton().props.onClick();await e.settle();
+ assert.deepEqual(types,['Accessory','Bottom']);
 });
