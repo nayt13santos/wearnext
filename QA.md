@@ -1,5 +1,12 @@
 # Verification
 
+## Generate Outfit feedback — October 19, 2026
+
+- Reproduced a phone layout issue: Generate updated the result below the viewport while the button and visible page appeared unchanged.
+- Each attempt now focuses and scrolls to the result, announces the outcome, and displays no-match feedback beside the button. Empty wardrobes and unexpected generator errors provide instructions instead of a silent action.
+- All 43 automated tests pass, including four screen-interaction regressions. TypeScript validation and the production build pass.
+- Verified successful generation and no-match feedback in Chrome at a 390 × 844 phone viewport using sample clothes. The user's private wardrobe and device session were not used for these checks.
+
 ## Passed locally
 
 - 37 automated tests: outfit generation, locks, rotation boundaries, shoe/accessory exceptions, laundry/archive exclusions, purchase scoring, backend authentication, validation, safe error responses, upload idempotency, protected photo access, wear/undo history, connection transport, preservation of live setup URLs, separate gallery/camera controls, cancellation, disabled controls, color sampling, upload-response photo reuse, close/reopen during processing, stale processing failures, failed batch retry/skip, and cloud-save retry preservation.
