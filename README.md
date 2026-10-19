@@ -7,6 +7,7 @@ A personal wardrobe web app. GitHub Pages hosts the interface. A separate Google
 - Upload clothing photos individually or review a batch one item at a time.
 - Rotate, resize, zoom/crop, and optionally clean a simple background on the device. Category is suggested by an on-device image model and color from pixels. Unclear photos require a category selection; you can always override a suggestion. Confirm fabric and dress code yourself.
 - Generate outfits for a purpose, temperature, rain and indoor air conditioning. Lock favorites and swap available alternatives.
+- Choose a colorway or let Automatic find a coordinated palette. Outfits use up to three saved color families, including shoes, layers and kept accessories; swaps stay in the same palette. Twelve presets cover neutrals, tonal colors, earthy combinations and accents. Adobe Color and Coolors links open optional inspiration tools; no wardrobe data is sent to them. Check an item's saved color if its photo and suggestions disagree.
 - Rest each clothing piece for 30 days after recording it as worn. Shoes/accessories can repeat. Adjust the interval from 0 to 90 days.
 - Exclude laundry and archived clothing. Undo mistaken wears without deleting audit history.
 - Score a potential purchase against compatible combinations, similar owned pieces, wardrobe gaps and budget. This is a transparent rules-based score, not semantic image recognition or a guarantee of fit or quality.

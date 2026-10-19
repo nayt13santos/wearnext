@@ -1,3 +1,4 @@
+import {colorways,findColorway,matchesColorway,type Colorway} from './colorways.ts';
 export const categories = ['Top','Bottom','One-piece','Shoes','Layer','Accessory'] as const;
 export type Category = typeof categories[number];
 export const occasions = ['Everyday','Office','Dinner out','Formal event','Workout','Travel'] as const;
@@ -5,7 +6,7 @@ export const colors = ['White','Black','Grey','Navy','Blue','Green','Beige','Bro
 export type Piece = {id:string;name:string;category:Category;color:string;style:string;warmth:number;pattern:string;material:string;waterproof:boolean;laundry:boolean;archived:boolean;favorite:boolean;image:string;original?:string;sample?:number;fingerprint?:string};
 export type Wear = {id:string;day:string;items:Piece[];occasion:string;temperature:number};
 export type Preferences = {cooldown:number;city:string;latitude:number;longitude:number;budget:number;currency:string};
-export type Context = {day:string;temperature:number;rain:boolean;occasion:string;aircon:boolean};
+export type Context = {day:string;temperature:number;rain:boolean;occasion:string;aircon:boolean;colorway?:string};
 export const defaults:Preferences={cooldown:30,city:'Marikina',latitude:14.65,longitude:121.1,budget:1500,currency:'PHP'};
 export function dayToday(){return new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Manila',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());}
 export function daysBetween(a:string,b:string){return Math.floor((Date.parse(a+'T00:00:00Z')-Date.parse(b+'T00:00:00Z'))/86400000);}
@@ -33,24 +34,38 @@ export function scorePiece(p:Piece,c:Context,wears:Wear[]){
 export function generateOutfit(pieces:Piece[],wears:Wear[],prefs:Preferences,c:Context,locks:string[]=[],previous:string[]=[],random= Math.random){
  const pool=pieces.filter(p=>availability(p,wears,c.day,prefs.cooldown)==='Available'&&suitable(p,c));
  const locked=locks.map(id=>pool.find(p=>p.id===id)).filter(Boolean) as Piece[];
- if(locked.length!==locks.length)return {items:[] as Piece[],reason:'A locked piece is unavailable for this date or occasion. Unlock it or change your plans.'};
- const grouped=new Map(categories.map(cat=>[cat,pool.filter(p=>p.category===cat).map(p=>({piece:p,score:scorePiece(p,c,wears)+(previous.includes(p.id)?0:12)+random()*15+(locks.includes(p.id)?1000:0)})).sort((a,b)=>b.score-a.score).slice(0,50).map(x=>x.piece)]));
- const groups=(cat:Category)=>grouped.get(cat)!;
- let best:Piece[]=[];let bestScore=-Infinity;
- const shoes=groups('Shoes');const layers=groups('Layer');
- const bodies:Piece[][]=[...groups('One-piece').map(p=>[p]),...groups('Top').flatMap(t=>groups('Bottom').map(b=>[t,b]))];
- for(const body of bodies){if(!compatible(body))continue;
-  for(const shoe of shoes){let combo=[...body,shoe];
-   const layerLock=locked.find(p=>p.category==='Layer');const layer=layerLock||layers.find(p=>compatible([...combo,p]));
-   if(c.temperature<18&&!layer)continue;
-   if(layer&&(layerLock||c.temperature<23||c.aircon))combo.push(layer);
-   combo.push(...locked.filter(p=>p.category==='Accessory'));
-   if(!locked.every(p=>combo.some(x=>x.id===p.id))||!compatible(combo))continue;
-   const score=combo.reduce((s,p)=>s+scorePiece(p,c,wears)+(previous.includes(p.id)?0:10),0)/combo.length+random()*20;
-   if(score>bestScore){bestScore=score;best=combo;}
+ if(locked.length!==locks.length)return {items:[] as Piece[],colorway:undefined,reason:'A locked piece is unavailable for this date or occasion. Unlock it or change your plans.'};
+ const selected=c.colorway&&c.colorway!=='Automatic'?findColorway(c.colorway):undefined;
+ const palettes=c.colorway&&c.colorway!=='Automatic'?(selected?[selected]:[]):colorways;
+ const ranked=pool.map(p=>({piece:p,score:scorePiece(p,c,wears)+(previous.includes(p.id)?0:12)+random()*15})).sort((a,b)=>b.score-a.score).map(x=>x.piece);
+ let best:Piece[]=[];let bestScore=-Infinity;let bestPalette:Colorway|undefined;
+ for(const palette of palettes){
+  if(locked.length&&!matchesColorway(locked,palette,false))continue;
+  const grouped=new Map(categories.map(cat=>{
+   const required=locked.filter(p=>p.category===cat);
+   const choices=required.length?required:ranked.filter(p=>p.category===cat&&palette.colors.includes(p.color));
+   // Keep each available color represented before applying the search limit.
+   const representatives=[...new Set(choices.map(p=>p.color))].map(color=>choices.find(p=>p.color===color)!);
+   return [cat,[...representatives,...choices.filter(p=>!representatives.includes(p))].slice(0,50)] as const;
+  }));
+  const groups=(cat:Category)=>grouped.get(cat)!;
+  const shoes=groups('Shoes'),layers=groups('Layer'),layerLock=locked.find(p=>p.category==='Layer');
+  const bodies:Piece[][]=[...groups('One-piece').map(p=>[p]),...groups('Top').flatMap(t=>groups('Bottom').map(b=>[t,b]))];
+  for(const body of bodies){if(!matchesColorway(body,palette,false))continue;
+   for(const shoe of shoes){let combo=[...body,shoe,...locked.filter(p=>p.category==='Accessory')];
+    if(!matchesColorway(combo,palette,false))continue;
+    if(layerLock||c.temperature<23||c.aircon){
+     const layer=layers.find(p=>matchesColorway([...combo,p],palette));
+     if(layer)combo.push(layer);else if(layerLock||c.temperature<18)continue;
+    }
+    if(!locked.every(p=>combo.some(x=>x.id===p.id))||!matchesColorway(combo,palette))continue;
+    const score=combo.reduce((s,p)=>s+scorePiece(p,c,wears)+(previous.includes(p.id)?0:10),0)/combo.length+random()*20;
+    if(score>bestScore){bestScore=score;best=combo;bestPalette=palette;}
+   }
   }
  }
- return {items:best,reason:best.length?'':`No complete outfit fits these rules. You need available ${shoes.length?'tops + bottoms (or a one-piece)':'shoes and a top + bottom (or a one-piece)'}${c.temperature<18?' plus a warm layer':''}. Add clothes, finish laundry, or adjust your occasion/rotation in Preferences.`};
+ const paletteHint=selected?` the ${selected.name} colorway`:' a coordinated colorway';
+ return {items:best,colorway:bestPalette,reason:best.length?'':`No complete outfit fits${paletteHint} and your plans. You need available tops + bottoms (or a one-piece) and shoes${c.temperature<18?' plus a warm layer':''}. Try another colorway${locks.length?', unlock a piece':''}, check saved colors, or adjust your occasion/rotation in Preferences.`};
 }
 export function similarity(a:Piece,b:Piece){
  if(a.category!==b.category)return 0;
