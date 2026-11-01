@@ -1,5 +1,12 @@
 # Verification
 
+## Sliding outfit picker and suggestions — November 2, 2026
+
+- Automated coverage includes category swaps, optional finishing pieces, required cold-weather layers, defining palette colors, locked pieces, unique suggestions, dismissal/selection, and clearing stale looks when plans or wardrobe state changes.
+- Slider regressions exercise centered selections after resizing, settled swipe selection (including None), and cancellation when a row is locked or unmounted.
+- Browser checks with fictional sample clothes at desktop width and 390 × 844: centered selections, keyboard swaps, selection after layout resizing, suggestion dismissal, and choosing a suggestion to return to Mix & match. The phone page has no horizontal overflow and the browser reported no console errors.
+- Physical-device touch gestures and private Google storage were not exercised. Suggestions stay in session and do not create saved outfits or wear-history records.
+
 ## Photo category recognition — October 19, 2026
 
 - 53 automated tests pass. Added category score selection and editor regressions for manual overrides, slow/stale detection, model failures, unclear photos and independent batch categories. TypeScript and production build pass.

@@ -6,6 +6,7 @@ import {runInNewContext} from 'node:vm';
 import ts from 'typescript';
 import * as wardrobe from '../lib/wardrobe.ts';
 import * as colorways from '../lib/colorways.ts';
+import * as outfitViews from '../lib/outfit-views.ts';
 
 const require=createRequire(import.meta.url);
 const source=readFileSync(new URL('../app/studio.tsx',import.meta.url),'utf8')
@@ -29,7 +30,7 @@ function studio({failGeneration=false,reducedMotion=false,samples=wardrobe.demoP
    old?.cleanup?.();hooks[i]={deps,cleanup:callback()};
   });
  }};
- const modules={react,'@/lib/colorways':colorways,'./piece-editor':{default:'PieceEditor',Choice:'Choice',Toggle:'Toggle',PiecePhoto:'PiecePhoto'},
+ const modules={react,'@/lib/outfit-views':outfitViews,'./outfit-picker':{default:'OutfitPicker'},'./outfit-suggestions':{default:'OutfitSuggestions'},'@/lib/colorways':colorways,'./piece-editor':{default:'PieceEditor',Choice:'Choice',Toggle:'Toggle',PiecePhoto:'PiecePhoto'},
   './connection-panel':{default:'ConnectionPanel'},'@/lib/client':{},'@/lib/connection':{readConnection:()=>null},
   '@/lib/wardrobe':{...wardrobe,demoPieces:samples,generateOutfit(...args){if(failGeneration)throw Error('Unexpected data');return wardrobe.generateOutfit(...args);}}};
  const exports={};
@@ -101,10 +102,47 @@ test('visible swaps preserve both defining complementary colors',()=>{
   {...wardrobe.demoPieces[2],id:'orange',color:'Orange'},wardrobe.demoPieces[4],
  ];
  const s=studio({samples});s.click('Try a sample wardrobe');chooseColorway(s,'Blue & orange');s.click('Generate my outfit');
- const alternatives=s.nodes().filter(n=>n.props?.className==='alternative');
- assert.equal(alternatives.length,1);assert.doesNotMatch(s.text(alternatives),/White top/);
- alternatives[0].props.onClick();
+ const picker=s.nodes().find(n=>n.type==='OutfitPicker');
+ const options=outfitViews.swapOptions(picker.props.pieces,picker.props.wears,picker.props.preferences,picker.props.context,picker.props.outfit,picker.props.palette,'Top');
+ assert.equal(options.length,2);assert.ok(options.every(p=>p.id!=='white'));
+ const originalTop=picker.props.outfit.find(p=>p.category==='Top');
+ picker.props.onSelect('Top',samples.find(p=>p.id==='white'));
+ assert.equal(s.nodes().find(n=>n.type==='OutfitPicker').props.outfit.find(p=>p.category==='Top').id,originalTop.id);
+ picker.props.onSelect('Top',options.find(p=>p.id!==originalTop.id));
  const selected=s.nodes().filter(n=>n.type==='PiecePhoto'&&n.props.piece.id!=='white');
  assert.ok(selected.some(n=>n.props.piece.color==='Orange'));
  assert.match(s.text(s.nodes().find(n=>n.props?.className==='outfit-colorway')),/Blue & orange/);
+});
+
+
+test('suggestions can be dismissed and selected without recording a wear',()=>{
+ const s=studio();s.click('Try a sample wardrobe');chooseColorway(s,'Blue tonal');s.click('Suggestions');
+ const panel=()=>s.nodes().find(n=>n.type==='OutfitSuggestions');
+ assert.ok(panel().props.suggestions.length>1);
+ const first=panel().props.suggestions[0];
+ panel().props.onDismiss(outfitViews.outfitKey(first.items));
+ assert.ok(panel().props.suggestions.every(item=>outfitViews.outfitKey(item.items)!==outfitViews.outfitKey(first.items)));
+ const chosen=panel().props.suggestions[0];panel().props.onChoose(chosen);
+ assert.equal(panel(),undefined);
+ const picker=s.nodes().find(n=>n.type==='OutfitPicker');
+ assert.deepEqual(picker.props.outfit,chosen.items);assert.equal(picker.props.wears.length,0);
+ assert.match(s.status(),/Outfit selected/);
+});
+
+test('locked pieces cannot be changed by sliders and constrain fresh suggestions',()=>{
+ const s=studio();s.click('Try a sample wardrobe');s.click('Generate my outfit');
+ const picker=()=>s.nodes().find(n=>n.type==='OutfitPicker');
+ const top=picker().props.outfit.find(p=>p.category==='Top');
+ picker().props.onLock(top);
+ picker().props.onSelect('Top',wardrobe.demoPieces.find(p=>p.category==='Top'&&p.id!==top.id));
+ assert.equal(picker().props.outfit.find(p=>p.category==='Top').id,top.id);
+ s.click('Suggestions');
+ const suggestions=s.nodes().find(n=>n.type==='OutfitSuggestions').props.suggestions;
+ assert.ok(suggestions.length);assert.ok(suggestions.every(s=>s.items.some(p=>p.id===top.id)));
+});
+
+test('changing plans clears all previously generated suggestions',()=>{
+ const s=studio();s.click('Try a sample wardrobe');s.click('Suggestions');
+ chooseColorway(s,'Red accent');
+ assert.equal(s.nodes().find(n=>n.type==='OutfitSuggestions').props.suggestions.length,0);
 });
