@@ -5,28 +5,25 @@
 .outfit-view-switch { display: inline-flex; padding: 4px; gap: 4px; background: #e5eaf2; border-radius: 24px; margin-bottom: 20px; }
 .outfit-view-switch button { background: transparent; color: var(--muted-foreground); border: 0; border-radius: 20px; padding: 10px 20px; font: inherit; font-size: 14px; font-weight: 650; }
 .outfit-view-switch button[aria-pressed=true] { background: white; color: var(--foreground); box-shadow: 0 2px 6px #1825340d; }
-.builder-layout { display: grid; grid-template-columns: minmax(0, 1fr) 240px; gap: 24px; align-items: start; }
-.builder-layout .alternatives-panel { min-width: 0; padding-top: 0; grid-column: auto; }
-.outfit-collage { grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 18px; align-items: start; }
-.outfit-collage .outfit-piece { grid-row: auto; }
-.outfit-collage .category-top { grid-column: 1; grid-row: 1; }
-.outfit-collage .category-bottom { grid-column: 1; grid-row: 2 / span 2; }
-.outfit-collage .category-one-piece { grid-column: 1; grid-row: 1 / span 3; align-self: center; }
-.outfit-collage .category-layer { grid-column: 2; grid-row: 1; }
-.outfit-collage .category-accessory { grid-column: 2; grid-row: 2; }
-.outfit-collage .category-shoes { grid-column: 2; grid-row: 3; }
-.outfit-collage .outfit-piece .piece-photo { margin: 0; }
-.outfit-collage .photo-select { border: 0; padding: 0; }
-.outfit-collage .photo-select.selected { background: #fff; }
-.outfit-collage .piece-caption .icon-button { width: 36px; height: 36px; }
-.outfit-picker > h2 { font-size: 18px; }
-.picker-intro, .picker-placeholder p { font-size: 13px; margin: 8px 0 18px; line-height: 1.6; }
-.piece-rail { min-width: 0; padding: 14px 0 18px; border-top: 1px solid var(--border); }
-.rail-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 9px; }
+.outfit-editor { padding: 0; overflow: visible; }
+.outfit-editor > .board-label { padding: 18px 22px 0; }
+.editor-summary { position: sticky; top: 0; z-index: 2; display: flex; align-items: center; justify-content: center; gap: 22px; padding: 16px 22px; background: #fff; border-bottom: 1px solid var(--border); border-radius: 18px 18px 0 0; }
+.editor-outfit-preview { width: 112px; flex: 0 0 112px; }
+.editor-outfit-preview .suggestion-collage { padding: 0; gap: 3px; }
+.editor-summary .outfit-colorway { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; border: 0; padding: 0; margin: 0; }
+.editor-summary .outfit-colorway strong { font-size: 17px; }
+.editor-summary .outfit-colorway p { font-size: 12px; margin: 0; }
+.editor-summary .color-swatches > span { width: 18px; height: 18px; }
+.outfit-picker { max-width: 680px; margin-inline: auto; padding: 6px 22px 0; }
+.outfit-picker .piece-rail:first-of-type { border-top: 0; }
+.outfit-editor .outfit-notes { padding: 14px 22px; }
+.outfit-editor .wear-button { width: calc(100% - 44px); margin: 0 22px 22px; }
+.piece-rail { min-width: 0; padding: 10px 0 14px; border-top: 1px solid var(--border); }
+.rail-heading { position: relative; display: flex; align-items: center; justify-content: center; min-height: 38px; margin-bottom: 9px; }
 .rail-heading h3 { font-size: 14px; }
-.rail-controls { display: flex; gap: 2px; }
+.rail-controls { position: absolute; right: 0; display: flex; gap: 2px; }
 .rail-controls .icon-button { width: 36px; height: 36px; }
-.piece-track { --tile: 100px; position: relative; display: flex; gap: 12px; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scrollbar-width: none; padding: 4px max(0px, calc((100% - var(--tile)) / 2)) 7px; }
+.piece-track { --tile: 136px; position: relative; display: flex; gap: 12px; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scrollbar-width: none; padding: 4px max(0px, calc((100% - var(--tile)) / 2)) 7px; }
 .piece-track::-webkit-scrollbar { display: none; }
 .is-locked .piece-track { overflow-x: hidden; }
 .piece-track:focus-visible { outline: 2px solid #88a3ff; outline-offset: 2px; border-radius: 8px; }
@@ -70,11 +67,7 @@
 .suggestions-empty { padding: 48px 24px; background: #fff; border-radius: 14px; text-align: center; }
 .suggestions-empty p { margin: 10px auto 22px; font-size: 14px; }
 @media (max-width: 1050px) {
- .builder-layout { grid-template-columns: minmax(0, 1fr); }
- .outfit-picker { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 24px; }
- .outfit-picker > h2, .picker-intro { grid-column: 1 / -1; }
  .suggestion-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
- .outfit-collage .piece-photo { max-width: 210px; margin-inline: auto; }
 }
 @media (min-width: 1051px) and (max-width: 1250px) { .suggestion-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 900px) { .planner-grid { grid-template-columns: 220px minmax(0, 1fr); gap: 22px; } .suggestion-grid { grid-template-columns: minmax(0, 1fr); } }
@@ -82,10 +75,14 @@
  .planner-grid { grid-template-columns: minmax(0, 1fr); gap: 22px; }
  .outfit-view-switch { display: flex; margin-bottom: 16px; }
  .outfit-view-switch button { flex: 1; min-height: 44px; padding-inline: 12px; }
- .builder-layout { gap: 24px; }
- .outfit-picker { display: block; }
- .outfit-collage { gap: 14px 12px; }
- .outfit-collage .piece-caption { gap: 0; }
+ .outfit-editor > .board-label { padding: 14px 16px 0; }
+ .editor-summary { gap: 14px; padding: 12px 16px; }
+ .editor-outfit-preview { width: 90px; flex-basis: 90px; }
+ .editor-summary .outfit-colorway strong { font-size: 16px; }
+ .outfit-picker { padding-inline: 10px; }
+ .outfit-editor .outfit-notes { padding-inline: 16px; }
+ .outfit-editor .wear-button { width: calc(100% - 32px); margin: 0 16px 16px; }
+ .rail-heading { justify-content: flex-start; padding-left: 6px; min-height: 44px; }
  .piece-track { --tile: 112px; }
  .rail-controls .icon-button { width: 44px; height: 44px; }
  .rail-caption span { font-size: 12px; }

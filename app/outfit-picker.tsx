@@ -69,7 +69,7 @@ export default function OutfitPicker({pieces, wears, preferences, context, outfi
  pieces: Piece[]; wears: Wear[]; preferences: Preferences; context: Context; outfit: Piece[]; palette: Colorway; locks: string[];
  onSelect: (category: Category, piece: Piece | null) => void; onLock: (piece: Piece) => void;
 }) {
- return <div className="outfit-picker"><h2>Make it yours</h2><p className="picker-intro">Slide each row to change one piece. The rest of your look stays in place.</p>
+ return <div className="outfit-picker" role="group" aria-label="Build your outfit"><h2 className="sr-only">Slide to build your outfit</h2>
   {categories.map(category => {
    const selected = outfit.find(p => p.category === category);
    if (!selected && category !== 'Layer' && category !== 'Accessory') return null;
