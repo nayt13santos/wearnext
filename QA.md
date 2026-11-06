@@ -60,3 +60,13 @@ These are not represented as completed by the mocked test suite.
 - Saving now uses the authoritative state returned by upload instead of issuing another state request, and seeds the session-only photo cache with the uploaded display image instead of downloading it again.
 - Color sampling uses a linear nearest-swatch search. A local synthetic 1200×1200 benchmark (five runs) averaged 189ms before and 9ms after with the same color. This is not an end-to-end phone or Google upload benchmark.
 - Independent read-only Bugbot-style review: no introduced regressions identified; two pre-existing editor bugs found. Both fixed after user approval: opening resets processing state and stale callbacks cannot overwrite a new session; failed batch items remain available for explicit Retry/Skip, with the prior saved preview cleared. Five new editor regression tests cover these transitions and cloud-save retry. The independent review ran once before these fixes; subsequent verification is the regression suite and build, not a second review.
+
+
+## Automatic photo tags and color repair
+
+- On a connected device, choose a clear garment photo: it should tag and save without an extra Save click. Category, color and pattern must be selected if uncertain. No guessed Cotton or waterproof tag.
+- Upload the same photo twice, including in the same batch and against an archived piece: no extra item. Re-saved/resized similar images must show possible matches with Skip / Save as a separate piece.
+- Interrupt a cloud save and retry: the same photo operation ID is reused, and the current cloud wardrobe is checked before uploading again. Bad photos must not discard the remaining batch.
+- Repair color tags from Wardrobe. Check white clothing with grey shadows, pale blue, navy, charcoal grey, olive green, narrow garments and contrasting backgrounds. Verify uncertain colors remain unchanged, clear changes persist, and Undo restores the previous color without changing other fields.
+- Stop after the current photo/piece, then resume. Closing is blocked during an active save. Reloading after a completed save must show the server-confirmed record.
+- Phone layout: check at 390 × 844; all controls fit, review lists scroll within the dialog, camera picker remains available. A physical iPhone camera/HEIC and live private Google storage still require device/account testing.

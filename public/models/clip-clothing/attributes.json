@@ -1,0 +1,157 @@
+[
+  {
+    "field": "color",
+    "value": "White",
+    "label": "white clothing"
+  },
+  {
+    "field": "color",
+    "value": "Black",
+    "label": "black clothing"
+  },
+  {
+    "field": "color",
+    "value": "Grey",
+    "label": "grey clothing"
+  },
+  {
+    "field": "color",
+    "value": "Navy",
+    "label": "navy clothing"
+  },
+  {
+    "field": "color",
+    "value": "Blue",
+    "label": "blue clothing"
+  },
+  {
+    "field": "color",
+    "value": "Green",
+    "label": "green clothing"
+  },
+  {
+    "field": "color",
+    "value": "Beige",
+    "label": "beige clothing"
+  },
+  {
+    "field": "color",
+    "value": "Brown",
+    "label": "brown clothing"
+  },
+  {
+    "field": "color",
+    "value": "Red",
+    "label": "red clothing"
+  },
+  {
+    "field": "color",
+    "value": "Pink",
+    "label": "pink clothing"
+  },
+  {
+    "field": "color",
+    "value": "Purple",
+    "label": "purple clothing"
+  },
+  {
+    "field": "color",
+    "value": "Yellow",
+    "label": "yellow clothing"
+  },
+  {
+    "field": "color",
+    "value": "Orange",
+    "label": "orange clothing"
+  },
+  {
+    "field": "color",
+    "value": "Multicolor",
+    "label": "multicolor clothing"
+  },
+  {
+    "field": "pattern",
+    "value": "Solid",
+    "label": "plain solid-colored clothing with no pattern"
+  },
+  {
+    "field": "pattern",
+    "value": "Striped",
+    "label": "clothing with stripes"
+  },
+  {
+    "field": "pattern",
+    "value": "Checked",
+    "label": "clothing with a checkered plaid pattern"
+  },
+  {
+    "field": "pattern",
+    "value": "Printed",
+    "label": "clothing with a graphic print or floral pattern"
+  },
+  {
+    "field": "material",
+    "value": "Cotton",
+    "label": "cotton fabric clothing"
+  },
+  {
+    "field": "material",
+    "value": "Linen",
+    "label": "linen fabric clothing"
+  },
+  {
+    "field": "material",
+    "value": "Denim",
+    "label": "denim clothing"
+  },
+  {
+    "field": "material",
+    "value": "Wool",
+    "label": "wool knit clothing"
+  },
+  {
+    "field": "material",
+    "value": "Synthetic",
+    "label": "synthetic polyester sports fabric clothing"
+  },
+  {
+    "field": "material",
+    "value": "Leather",
+    "label": "leather or faux leather clothing or shoes"
+  },
+  {
+    "field": "style",
+    "value": "Casual",
+    "label": "casual everyday clothing"
+  },
+  {
+    "field": "style",
+    "value": "Smart",
+    "label": "smart business casual clothing"
+  },
+  {
+    "field": "style",
+    "value": "Formal",
+    "label": "formal evening or business clothing"
+  },
+  {
+    "field": "style",
+    "value": "Sport",
+    "label": "athletic sportswear for exercising"
+  },
+  {
+    "field": "warmth",
+    "value": "1",
+    "label": "thin lightweight summer clothing"
+  },
+  {
+    "field": "warmth",
+    "value": "2",
+    "label": "medium weight clothing"
+  },
+  {
+    "field": "warmth",
+    "value": "3",
+    "label": "thick warm winter clothing"
+  }
+]

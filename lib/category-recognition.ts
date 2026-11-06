@@ -1,21 +1,21 @@
-import type {CategorySuggestion} from './category-rules';
+import type {ClothingRecognition} from './photo-tags';
 export type RecognitionOptions={signal?:AbortSignal;onProgress?:(message:string)=>void};
-type Pending={resolve:(result:CategorySuggestion)=>void;reject:(error:Error)=>void;progress?:(message:string)=>void;cleanup:()=>void};
+type Pending={resolve:(result:ClothingRecognition)=>void;reject:(error:Error)=>void;progress?:(message:string)=>void;cleanup:()=>void};
 let worker:Worker|undefined,nextId=0;
 const pending=new Map<number,Pending>();
-function reset(){worker?.terminate();worker=undefined;for(const request of pending.values()){request.cleanup();request.reject(new Error('Category detection is unavailable. Choose the category manually.'));}pending.clear();}
+function reset(){worker?.terminate();worker=undefined;for(const request of pending.values()){request.cleanup();request.reject(new Error('Clothing recognition is unavailable. You can enter the details manually.'));}pending.clear();}
 function getWorker(){
  if(worker)return worker;
  worker=new Worker(new URL('./category-worker.ts',import.meta.url),{type:'module'});
  worker.onerror=reset;
  worker.onmessage=event=>{
   const {id,result,error,status}=event.data,request=pending.get(id);if(!request)return;
-  if(status){request.progress?.(status==='loading'?'Preparing category detection…':'Recognizing clothing…');return;}
+  if(status){request.progress?.(status==='loading'?'Preparing automatic tags (first use downloads the detector)…':'Recognizing clothing and details…');return;}
   pending.delete(id);request.cleanup();if(error)request.reject(new Error(error));else request.resolve(result);
  };
  return worker;
 }
-export async function recognizeCategory(photo:Blob,options:RecognitionOptions={}):Promise<CategorySuggestion>{
+export async function recognizeCategory(photo:Blob,options:RecognitionOptions={}):Promise<ClothingRecognition>{
  options.signal?.throwIfAborted();
  const bitmap=await createImageBitmap(photo);
  let pixels:ImageData;
