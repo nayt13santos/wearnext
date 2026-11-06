@@ -33,3 +33,12 @@ test('retry after a failed cloud save reuses the same photo and operation identi
 test('wardrobe connection failure preserves the selected files for retry',async()=>{
  let attempts=0;const c=fixture({props:{loadPieces:async()=>{if(!attempts++)throw Error('Offline');return [];}}});c.choose(['a.jpg']);await c.settle();assert.ok(c.button('Retry / resume (1)'));c.button('Retry / resume (1)').props.onClick();await c.settle();assert.equal(c.saved.length,1);
 });
+
+test('correcting a color updates the automatic name while preserving a custom name',async()=>{
+ for(const custom of [false,true]){
+  const c=fixture({tags:{pieceFromPhoto:()=>({piece:{name:'Grey shirt',category:'Top',color:'Grey',warmth:1},review:['Color']})}});c.choose(['a.jpg']);await c.settle();
+  if(custom)c.nodes().find(n=>n.type==='input'&&n.props.value==='Grey shirt').props.onChange({target:{value:'My favorite shirt'}});
+  c.nodes().find(n=>n.type==='Choice'&&n.props.label==='Color').props.onChange('Blue');
+  c.button('Save clothing').props.onClick();await c.settle();assert.equal(c.saved[0].piece.name,custom?'My favorite shirt':'Blue shirt');
+ }
+});

@@ -8,7 +8,7 @@ import {recognizeCategory} from '@/lib/category-recognition';
 import {pieceFromPhoto} from '@/lib/photo-tags';
 import {checkDuplicate,type DuplicateCheck} from '@/lib/wardrobe-photos';
 
-type Job={file:File;status:'waiting'|'working'|'saved'|'duplicate'|'review'|'failed';message:string;photo?:PhotoResult;piece?:Piece;required:string[];duplicates?:DuplicateCheck};
+type Job={file:File;status:'waiting'|'working'|'saved'|'duplicate'|'review'|'failed';message:string;photo?:PhotoResult;piece?:Piece;required:string[];automaticName?:string;duplicates?:DuplicateCheck};
 type Props={open:boolean;onClose:()=>void;loadPieces:()=>Promise<Piece[]>;onSave:(piece:Piece,photo:PhotoResult)=>Promise<Piece>};
 export default function AutoUpload({open,onClose,loadPieces,onSave}:Props){
   const [jobs,setJobs]=useState<Job[]>([]),[busy,setBusy]=useState(false),[status,setStatus]=useState(''),[error,setError]=useState('');
@@ -38,7 +38,7 @@ export default function AutoUpload({open,onClose,loadPieces,onSave}:Props){
             abort.signal.throwIfAborted();
             const analysis=job.photo.analysis||await analyzePhoto(job.photo.original);
             const result=pieceFromPhoto(recognition,analysis.colors,job.photo.url,job.photo.fingerprint);
-            job.piece=result.piece;job.required=result.review;
+            job.piece=result.piece;job.automaticName=result.piece.name;job.required=result.review;
           }
           if(job.required.length||job.duplicates.similar.length||job.duplicates.unchecked){
             job.status='review';job.message=job.duplicates.similar.length?'This may already be in your wardrobe.':job.duplicates.unchecked?'Some saved photos could not be checked for duplicates.':'A few details need your eye.';
@@ -59,7 +59,10 @@ export default function AutoUpload({open,onClose,loadPieces,onSave}:Props){
     catch(e){job.status='review';job.message=(e as Error).message;}
     finally{working.current=false;setBusy(false);publish();}
   }
-  function change(job:Job,key:keyof Piece,value:Piece[keyof Piece],field:string){job.piece={...job.piece!,[key]:value};job.required=job.required.filter(r=>r!==field);publish();}
+  function change(job:Job,key:keyof Piece,value:Piece[keyof Piece],field:string){
+    if(!job.piece)return;
+    if(key==='color'&&job.piece.name===job.automaticName&&job.piece.name.startsWith(job.piece.color+' ')){job.automaticName=String(value)+job.piece.name.slice(job.piece.color.length);job.piece={...job.piece,name:job.automaticName};}
+    job.piece={...job.piece!,[key]:value};job.required=job.required.filter(r=>r!==field);publish();}
   const pending=jobs.filter(j=>['waiting','failed'].includes(j.status)).length;
   return <Dialog open={open} onOpenChange={v=>{if(!v&&!working.current)onClose();}}><DialogContent className="photo-dialog auto-upload"><DialogHeader><DialogTitle>Add your clothes</DialogTitle><DialogDescription>Choose photos and we’ll tag and save them automatically. Possible duplicates and unclear details appear here for review.</DialogDescription></DialogHeader>
     <PhotoPicker disabled={busy} multiple onChoose={files=>void process(files)}/>
