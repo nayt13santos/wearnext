@@ -15,6 +15,6 @@ export function suggestCategory(scores:ArrayLike<number>,labels:readonly Categor
  const ranked=[...groups].sort((a,b)=>b[1].score-a[1].score);
  const [category,best]=ranked[0],runner=ranked[1]?.[1].score??best.score;
  const confidence=1/ranked.reduce((sum,[,entry])=>sum+Math.exp((entry.score-best.score)*100),0);
- const clear=categories.includes(category as Piece['category'])&&best.score>=.25&&best.score-runner>=.02&&confidence>=.65;
+ const clear=categories.includes(category as Piece['category'])&&best.score>=.25&&best.score-runner>=.018&&confidence>=.65;
  return {category:clear?category as Piece['category']:null,confidence,label:best.label};
 }

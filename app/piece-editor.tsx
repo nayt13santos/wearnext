@@ -10,7 +10,7 @@ import {categories,colors,type Piece} from '@/lib/wardrobe';
 import {processPhoto,type PhotoResult} from '@/lib/photo';
 import {photoSource} from '@/lib/client';
 import {recognizeCategory} from '@/lib/category-recognition';
-export function Choice({label,value,options,onChange}:{label:string;value:string;options:readonly string[];onChange:(s:string)=>void}){return <label className="field"><span>{label}</span><Select value={value} onValueChange={onChange}><SelectTrigger className="choice-trigger" aria-label={label}><SelectValue placeholder="Choose category"/></SelectTrigger><SelectContent>{options.map(o=><SelectItem key={o} value={o}>{o}</SelectItem>)}</SelectContent></Select></label>}
+export function Choice({label,value,options,onChange}:{label:string;value:string;options:readonly string[];onChange:(s:string)=>void}){return <label className="field"><span>{label}</span><Select value={value} onValueChange={onChange}><SelectTrigger className="choice-trigger" aria-label={label}><SelectValue placeholder={"Choose "+label.toLowerCase()}/></SelectTrigger><SelectContent>{options.map(o=><SelectItem key={o} value={o}>{o}</SelectItem>)}</SelectContent></Select></label>}
 export function Toggle({label,checked,onChange,disabled=false}:{label:string;checked:boolean;onChange:(b:boolean)=>void;disabled?:boolean}){return <label className="toggle"><Checkbox disabled={disabled} checked={checked} onCheckedChange={v=>onChange(v===true)}/><span>{label}</span></label>}
 export function PiecePhoto({piece,className=''}:{piece:Piece;className?:string}){
  const [source,setSource]=useState(''),[failed,setFailed]=useState(false),[retry,setRetry]=useState(0);

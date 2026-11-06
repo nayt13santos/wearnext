@@ -30,7 +30,7 @@ function studio({failGeneration=false,reducedMotion=false,samples=wardrobe.demoP
    old?.cleanup?.();hooks[i]={deps,cleanup:callback()};
   });
  }};
- const modules={react,'@/lib/outfit-views':outfitViews,'./outfit-picker':{default:'OutfitPicker'},'./outfit-suggestions':{default:'OutfitSuggestions'},'@/lib/colorways':colorways,'./piece-editor':{default:'PieceEditor',Choice:'Choice',Toggle:'Toggle',PiecePhoto:'PiecePhoto'},
+ const modules={react,'./auto-upload':{default:'AutoUpload'},'./color-repair':{default:'ColorRepair'},'@/lib/outfit-views':outfitViews,'./outfit-picker':{default:'OutfitPicker'},'./outfit-suggestions':{default:'OutfitSuggestions'},'@/lib/colorways':colorways,'./piece-editor':{default:'PieceEditor',Choice:'Choice',Toggle:'Toggle',PiecePhoto:'PiecePhoto'},
   './connection-panel':{default:'ConnectionPanel'},'@/lib/client':{},'@/lib/connection':{readConnection:()=>null},
   '@/lib/wardrobe':{...wardrobe,demoPieces:samples,generateOutfit(...args){if(failGeneration)throw Error('Unexpected data');return wardrobe.generateOutfit(...args);}}};
  const exports={};
