@@ -24,7 +24,7 @@ Use your **personal Google account**, not a work account. This app uses separate
 2. In the Apps Script editor, select `setupWearNext` and Run. Review Google's permissions yourself. It creates a private Sheet and a private photo folder. Do not make either publicly accessible. The Drive scope is limited to files created/opened by this app; the spreadsheet scope is broader because Apps Script uses SpreadsheetApp. The code only opens the Sheet ID created by its setup.
 3. Deploy as a **Web app**, execute as **Me**, access **Anyone**. Every private request requires a 64-character connection key; the anonymous GET endpoint returns only an app/version health check.
 4. Run `setupWearNext` again after deployment to update the private Setup tab's deployment link. This function is idempotent: it preserves clothes, photos, history, preferences and the existing key.
-5. Open the app on each trusted phone. In Preferences, enter the deployment's `/exec` link and the `connection_key` from the private Setup tab. The key is kept in that browser's local storage. Never paste it into public source code, a screenshot, a public issue or a shared URL.
+5. Open the app on each trusted phone. In Settings, enter the deployment's `/exec` link and the `connection_key` from the private Setup tab. The key is kept in that browser's local storage. Never paste it into public source code, a screenshot, a public issue or a shared URL.
 6. Add to Home Screen in Safari (iPhone) or Chrome (Android). The installed browser context may require connecting once separately.
 
 If Google displays an account, permission or unverified-app warning, the owner must review that screen. Do not automate bypassing security warnings.

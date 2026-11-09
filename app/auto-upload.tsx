@@ -64,9 +64,9 @@ export default function AutoUpload({open,onClose,loadPieces,onSave}:Props){
     if(key==='color'&&job.piece.name===job.automaticName&&job.piece.name.startsWith(job.piece.color+' ')){job.automaticName=String(value)+job.piece.name.slice(job.piece.color.length);job.piece={...job.piece,name:job.automaticName};}
     job.piece={...job.piece!,[key]:value};job.required=job.required.filter(r=>r!==field);publish();}
   const pending=jobs.filter(j=>['waiting','failed'].includes(j.status)).length;
-  return <Dialog open={open} onOpenChange={v=>{if(!v&&!working.current)onClose();}}><DialogContent className="photo-dialog auto-upload"><DialogHeader><DialogTitle>Add your clothes</DialogTitle><DialogDescription>Choose photos and we’ll tag and save them automatically. Possible duplicates and unclear details appear here for review.</DialogDescription></DialogHeader>
+  return <Dialog open={open} onOpenChange={v=>{if(!v&&!working.current)onClose();}}><DialogContent className="photo-dialog auto-upload"><DialogHeader><DialogTitle>Add your clothes</DialogTitle><DialogDescription>Photos are tagged and saved automatically. Review possible duplicates or unclear details here.</DialogDescription></DialogHeader>
     <PhotoPicker disabled={busy} multiple onChoose={files=>void process(files)}/>
-    <p className="form-note">One piece per photo works best. Fabric, dress code and weight are photo estimates; fabric may stay Other. Rain protection needs your confirmation. The first scan downloads the on-device detector.</p>
+    <p className="small">One piece per photo works best.</p><details className="help-details"><summary>About automatic tags</summary><p className="form-note">Details are estimated from your photo. Fabric may stay Other; confirm rain protection yourself. The first scan downloads the detector so photos can be checked on your device.</p></details>
     {status&&<p role="status" className="upload-status">{status}</p>}{error&&<p role="alert" className="error">{error}</p>}
     {jobs.length>0&&<p className="upload-count">{jobs.filter(j=>j.status==='saved').length} saved · {jobs.filter(j=>j.status==='duplicate').length} already owned · {jobs.filter(j=>j.status==='review').length} to review</p>}
     <div className="upload-jobs">{jobs.map((job,index)=><article key={index} className="upload-job">

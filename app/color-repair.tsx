@@ -45,8 +45,8 @@ export default function ColorRepair({open,onClose,loadPieces,saveColor}:Props){
     finally{working.current=false;setBusy(false);publish();}
   }
   const remaining=rows.filter(r=>['waiting','failed'].includes(r.status)).length;
-  return <Dialog open={open} onOpenChange={v=>{if(!v&&!working.current)onClose();}}><DialogContent className="photo-dialog color-repair"><DialogHeader><DialogTitle>Repair color tags</DialogTitle><DialogDescription>Check every saved photo, including archived pieces. Clear corrections save automatically; uncertain colors stay for your review. Names, other details and wear history are kept.</DialogDescription></DialogHeader>
-    <p className="form-note">Keep this screen open while checking. The first scan downloads the detector. You can undo a correction here before closing.</p>
+  return <Dialog open={open} onOpenChange={v=>{if(!v&&!working.current)onClose();}}><DialogContent className="photo-dialog color-repair"><DialogHeader><DialogTitle>Repair color tags</DialogTitle><DialogDescription>Check all saved photos and fix clear color mistakes automatically. Review uncertain colors here.</DialogDescription></DialogHeader>
+    <p className="form-note">Keep this screen open while checking. You can undo corrections before closing. The first scan may take longer.</p>
     {status&&<p className="upload-status" role="status">{status}</p>}{error&&<p className="error" role="alert">{error}</p>}
     {!!rows.length&&<p className="upload-count">{rows.filter(r=>r.status==='repaired').length} corrected · {rows.filter(r=>r.status==='unchanged').length} already correct · {rows.filter(r=>r.status==='review').length} to review</p>}
     <div className="repair-rows">{rows.map(row=><article key={row.piece.id} className="repair-row"><PiecePhoto piece={row.piece}/><div><h3>{row.piece.name}</h3><p>{row.before}{row.color!==row.before?' → '+row.color:''}</p><p className="small">{row.message}</p>

@@ -51,9 +51,8 @@ test('camera requests a single rear-camera image; gallery retains batch upload',
   gallery.props.ref.current = {click: () => galleryClicks++};
   camera.props.ref.current = {click: () => cameraClicks++};
   buttons[0].props.onClick(); // Preview selects saved photos.
-  buttons[1].props.onClick(); // Upload photos.
-  buttons[2].props.onClick(); // Take a photo.
-  assert.equal(galleryClicks, 2);
+  buttons[1].props.onClick(); // Take a photo.
+  assert.equal(galleryClicks, 1);
   assert.equal(cameraClicks, 1);
 });
 

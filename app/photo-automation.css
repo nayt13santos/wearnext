@@ -1,1 +1,131 @@
-.auto-upload .upload-zone{min-height:150px;max-width:none;margin:8px 0}.auto-upload .upload-zone>svg{width:28px;height:28px}.auto-upload .photo-picker-note{font-size:12px}.upload-status{padding:14px 16px;background:#edf2ff;color:#233a70;border-radius:10px;overflow-wrap:anywhere}.upload-count{font-weight:650;font-size:14px}.upload-jobs,.repair-rows{display:grid;gap:12px}.upload-job,.repair-row{border:1px solid var(--border);border-radius:12px;padding:14px;background:white}.upload-job-heading{display:flex;align-items:center;gap:14px}.upload-job-heading>img{width:72px;height:84px;object-fit:contain;background:#f5f6f8;border-radius:8px}.upload-job-heading>div,.repair-row>div{min-width:0}.upload-job h3,.repair-row h3{overflow-wrap:anywhere}.upload-job p,.repair-row p{font-size:14px}.upload-review{padding-top:14px}.upload-review fieldset{margin:0;padding:0;border:0;min-width:0}.upload-review fieldset[disabled]{pointer-events:none;opacity:.6}.duplicate-matches{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:10px 0 18px}.duplicate-matches .piece-photo{width:100%;aspect-ratio:1;object-fit:contain}.duplicate-matches span{font-size:12px;display:block;overflow-wrap:anywhere}.repair-row{display:grid;grid-template-columns:100px 1fr;gap:18px;align-items:start}.repair-row>.piece-photo{width:100%;height:120px;object-fit:contain}.color-repair .field{margin:12px 0}.wardrobe-heading-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}@media(max-width:720px){.wardrobe-heading-actions{max-width:155px}.wardrobe-heading-actions .secondary{font-size:13px;padding:10px}.repair-row{grid-template-columns:78px 1fr;gap:12px}.repair-row>.piece-photo{height:100px}.duplicate-matches{grid-template-columns:repeat(2,minmax(0,1fr))}.upload-review .field-pair{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.auto-upload .upload-zone {
+  aspect-ratio: auto;
+  min-height: 150px;
+  max-width: none;
+  margin: 8px 0;
+}
+.auto-upload .upload-zone > svg {
+  width: 28px;
+  height: 28px;
+}
+.auto-upload .photo-picker-note {
+  font-size: 12px;
+}
+.upload-status {
+  padding: 14px 16px;
+  background: #e8efeb;
+  color: #27594f;
+  border-radius: 10px;
+  overflow-wrap: anywhere;
+}
+.upload-count {
+  font-weight: 650;
+  font-size: 14px;
+}
+.upload-jobs,
+.repair-rows {
+  display: grid;
+  gap: 12px;
+}
+.upload-job,
+.repair-row {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+  background: white;
+}
+.upload-job-heading {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.upload-job-heading > img {
+  width: 72px;
+  height: 84px;
+  object-fit: contain;
+  background: #f5f7f5;
+  border-radius: 8px;
+}
+.upload-job-heading > div,
+.repair-row > div {
+  min-width: 0;
+}
+.upload-job h3,
+.repair-row h3 {
+  overflow-wrap: anywhere;
+}
+.upload-job p,
+.repair-row p {
+  font-size: 14px;
+}
+.upload-review {
+  padding-top: 14px;
+}
+.upload-review fieldset {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+.upload-review fieldset[disabled] {
+  pointer-events: none;
+  opacity: 0.6;
+}
+.duplicate-matches {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin: 10px 0 18px;
+}
+.duplicate-matches .piece-photo {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: contain;
+}
+.duplicate-matches span {
+  font-size: 12px;
+  display: block;
+  overflow-wrap: anywhere;
+}
+.repair-row {
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  gap: 18px;
+  align-items: start;
+}
+.repair-row > .piece-photo {
+  width: 100%;
+  height: 120px;
+  object-fit: contain;
+}
+.color-repair .field {
+  margin: 12px 0;
+}
+.wardrobe-heading-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+@media (max-width: 720px) {
+  .wardrobe-heading-actions {
+    max-width: 155px;
+  }
+  .wardrobe-heading-actions .secondary {
+    font-size: 13px;
+    padding: 10px;
+  }
+  .repair-row {
+    grid-template-columns: 78px 1fr;
+    gap: 12px;
+  }
+  .repair-row > .piece-photo {
+    height: 100px;
+  }
+  .duplicate-matches {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .upload-review .field-pair {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
