@@ -561,3 +561,9 @@ details[open] > summary::after {
 }
 
 .planner-details .colorway-picker { grid-column: auto; min-width: 0; }
+
+@media (max-width: 380px) {
+  .app-header { gap: 8px; }
+  .wordmark { font-size: 21px; }
+  .planner-details .field:has(input[type="date"]) { grid-column: 1 / -1; }
+}
