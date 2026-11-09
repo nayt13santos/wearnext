@@ -1,8 +1,8 @@
 import {analyzePhotoColors,type PhotoColors} from './photo-colors';
 import {photoSignature,type VisualSignature} from './photo-similarity';
 export type PhotoAnalysis={colors:PhotoColors;signature:VisualSignature};
-export type PhotoResult={blob:Blob;original:Blob;url:string;color:string;fingerprint:string;analysis?:PhotoAnalysis};
-async function openPhoto(file:Blob):Promise<{image:CanvasImageSource;width:number;height:number;close:()=>void}> {
+export type PhotoResult={blob:Blob;original:Blob;url:string;color:string;fingerprint:string;analysis?:PhotoAnalysis;cleanup?:'cleaned'|'review'|'unavailable'};
+export async function openPhoto(file:Blob):Promise<{image:CanvasImageSource;width:number;height:number;close:()=>void}> {
   try{const bitmap=await createImageBitmap(file,{imageOrientation:'from-image'});return {image:bitmap,width:bitmap.width,height:bitmap.height,close:()=>bitmap.close()};}catch{
     // Safari can decode some camera images through <img> that ImageBitmap rejects.
     const url=URL.createObjectURL(file),image=new Image();image.src=url;
@@ -10,7 +10,7 @@ async function openPhoto(file:Blob):Promise<{image:CanvasImageSource;width:numbe
     catch{URL.revokeObjectURL(url);throw new Error('This photo cannot be opened. Choose JPG, PNG or WebP, or take a new photo.');}
   }
 }
-function canvasOf(width:number,height:number){const canvas=document.createElement('canvas');canvas.width=width;canvas.height=height;const context=canvas.getContext('2d',{willReadFrequently:true});if(!context)throw new Error('Photo processing is unavailable.');return {canvas,context};}
+export function canvasOf(width:number,height:number){const canvas=document.createElement('canvas');canvas.width=width;canvas.height=height;const context=canvas.getContext('2d',{willReadFrequently:true});if(!context)throw new Error('Photo processing is unavailable.');return {canvas,context};}
 function jpeg(canvas:HTMLCanvasElement,quality:number){return new Promise<Blob>((resolve,reject)=>canvas.toBlob(b=>b?resolve(b):reject(new Error('Photo conversion failed.')),'image/jpeg',quality));}
 function analyzeCanvas(canvas:HTMLCanvasElement):PhotoAnalysis {
   const scale=Math.min(1,160/Math.max(canvas.width,canvas.height));

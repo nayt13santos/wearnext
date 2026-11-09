@@ -33,7 +33,7 @@ function editor(processPhoto,recognizeCategory=async()=>({category:'Top',confide
     });
   }};
   const modules={react,'./photo-picker':{default:'PhotoPicker'},
-    '@/lib/category-recognition':{recognizeCategory},'@/lib/photo':{processPhoto},'@/lib/client':{},'@/lib/wardrobe':{categories:[],colors:[]}};
+    '@/lib/category-recognition':{recognizeCategory},'@/lib/photo':{processPhoto},'@/lib/photo-display':{},'@/lib/wardrobe':{categories:[],colors:[]}};
   const exports={};
   runInNewContext(compiled,{exports,AbortController,URL:{revokeObjectURL:url=>revoked.push(url)},
     require:id=>modules[id]||(id.startsWith('@/components/')?new Proxy({}, {get:(_,key)=>String(key)}):require(id))});

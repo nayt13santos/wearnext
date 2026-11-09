@@ -4,7 +4,7 @@ import {component} from './helpers/component.mjs';
 function fixture(overrides={}){
  const saved=[],photos=[],checks=[];let closed=0;
  const props={open:true,onClose:()=>closed++,loadPieces:async()=>[],onSave:async(piece,photo)=>{saved.push({piece,photo});return {...piece,id:piece.name};},...overrides.props};
- const modules={'./photo-picker':{default:'PhotoPicker'},'./piece-editor':{Choice:'Choice',PiecePhoto:'PiecePhoto',Toggle:'Toggle'},'@/lib/wardrobe':{categories:[],colors:[]},
+ const modules={'@/lib/photo-cleanup':{prepareUploadPhoto:async photo=>Object.assign(photo,{cleanup:'cleaned'})},'./photo-picker':{default:'PhotoPicker'},'./piece-editor':{Choice:'Choice',PiecePhoto:'PiecePhoto',Toggle:'Toggle'},'@/lib/wardrobe':{categories:[],colors:[]},
  '@/lib/photo':{processPhoto:async file=>{const p={url:'blob:'+file.name,fingerprint:file.name,original:new Blob(),analysis:{colors:{}}};photos.push(p);return p;},...overrides.photo},
  '@/lib/category-recognition':{recognizeCategory:async()=>({})},'@/lib/photo-tags':{pieceFromPhoto:(_,colors,image,fingerprint)=>({piece:{name:fingerprint,category:'Top',color:'Blue',warmth:1,image,fingerprint},review:[]}),...overrides.tags},
  '@/lib/wardrobe-photos':{checkDuplicate:async(photo,pieces)=>{checks.push([...pieces]);return {similar:[],unchecked:0};},...overrides.duplicates}};

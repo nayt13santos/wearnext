@@ -4,6 +4,7 @@ import PhotoPicker from './photo-picker';
 import {Choice,PiecePhoto,Toggle} from './piece-editor';
 import {categories,colors,type Piece} from '@/lib/wardrobe';
 import {processPhoto,analyzePhoto,type PhotoResult} from '@/lib/photo';
+import {prepareUploadPhoto} from '@/lib/photo-cleanup';
 import {recognizeCategory} from '@/lib/category-recognition';
 import {pieceFromPhoto} from '@/lib/photo-tags';
 import {checkDuplicate,type DuplicateCheck} from '@/lib/wardrobe-photos';
@@ -32,6 +33,8 @@ export default function AutoUpload({open,onClose,loadPieces,onSave}:Props){
           abort.signal.throwIfAborted();
           progress('Checking for duplicates…');job.duplicates=await checkDuplicate(job.photo,known.current,abort.signal,progress);
           if(job.duplicates.exact){job.status='duplicate';job.message='Already saved as '+job.duplicates.exact.name;publish();continue;}
+          if(!job.photo.cleanup)job.photo=await prepareUploadPhoto(job.photo,{signal:abort.signal,onProgress:progress});
+          abort.signal.throwIfAborted();
           if(!job.piece){
             let recognition;try{recognition=await recognizeCategory(job.photo.original,{signal:abort.signal,onProgress:progress});}
             catch(e){abort.signal.throwIfAborted();recognition={category:null,confidence:0,label:''};}
@@ -43,7 +46,7 @@ export default function AutoUpload({open,onClose,loadPieces,onSave}:Props){
           if(job.required.length||job.duplicates.similar.length||job.duplicates.unchecked){
             job.status='review';job.message=job.duplicates.similar.length?'This may already be in your wardrobe.':job.duplicates.unchecked?'Some saved photos could not be checked for duplicates.':'A few details need your eye.';
           }else{
-            progress('Saving '+job.piece.name+'…');const saved=await onSave(job.piece,job.photo);known.current=[saved,...known.current.filter(p=>p.id!==saved.id)];job.status='saved';job.message='Tagged and saved';
+            progress('Saving '+job.piece.name+'…');const saved=await onSave(job.piece,job.photo);known.current=[saved,...known.current.filter(p=>p.id!==saved.id)];job.status='saved';job.message=job.photo.cleanup==='cleaned'?'Tagged, cleaned and saved':'Tagged and saved · Background kept';
           }
         }catch(e){if(abort.signal.aborted)break;job.status='failed';job.message=(e as Error).message;}
         if(token===generation.current)publish();
@@ -64,7 +67,7 @@ export default function AutoUpload({open,onClose,loadPieces,onSave}:Props){
     if(key==='color'&&job.piece.name===job.automaticName&&job.piece.name.startsWith(job.piece.color+' ')){job.automaticName=String(value)+job.piece.name.slice(job.piece.color.length);job.piece={...job.piece,name:job.automaticName};}
     job.piece={...job.piece!,[key]:value};job.required=job.required.filter(r=>r!==field);publish();}
   const pending=jobs.filter(j=>['waiting','failed'].includes(j.status)).length;
-  return <Dialog open={open} onOpenChange={v=>{if(!v&&!working.current)onClose();}}><DialogContent className="photo-dialog auto-upload"><DialogHeader><DialogTitle>Add your clothes</DialogTitle><DialogDescription>Photos are tagged and saved automatically. Review possible duplicates or unclear details here.</DialogDescription></DialogHeader>
+  return <Dialog open={open} onOpenChange={v=>{if(!v&&!working.current)onClose();}}><DialogContent className="photo-dialog auto-upload"><DialogHeader><DialogTitle>Add your clothes</DialogTitle><DialogDescription>Photos are tagged, cleaned and saved automatically. Review possible duplicates or unclear details here.</DialogDescription></DialogHeader>
     <PhotoPicker disabled={busy} multiple onChoose={files=>void process(files)}/>
     <p className="small">One piece per photo works best.</p><details className="help-details"><summary>About automatic tags</summary><p className="form-note">Details are estimated from your photo. Fabric may stay Other; confirm rain protection yourself. The first scan downloads the detector so photos can be checked on your device.</p></details>
     {status&&<p role="status" className="upload-status">{status}</p>}{error&&<p role="alert" className="error">{error}</p>}
