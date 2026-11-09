@@ -989,7 +989,7 @@ export default function Studio() {
               onClick={() => setRepair(true)}
             >
               <RefreshCw size={16} />
-              Repair color tags
+              Clean up wardrobe
             </button>
           </section>
           <div className="wardrobe-toolbar">

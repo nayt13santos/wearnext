@@ -129,3 +129,14 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+.cleanup-options { display: grid; gap: 4px; }
+.cleanup-options .toggle { margin: 4px 0 !important; min-height: 44px; }
+.cleanup-photo .piece-photo { width: 100%; height: auto; aspect-ratio: 1; object-fit: contain; }
+.cleanup-photo .quiet { width: 100%; min-height: 44px; }
+.cleanup-photo-status { margin-top: 12px; }
+.cleanup-size { padding: 0; border: 0; min-width: 0; }
+.cleanup-size .field > span { font-size: 12px; }
+.color-repair .repair-row { grid-template-columns: 140px minmax(0,1fr); }
+.color-repair .repair-row > div > .quiet { display: flex; }
+@media(max-width:720px) { .color-repair .repair-row { grid-template-columns: 104px minmax(0,1fr); } }

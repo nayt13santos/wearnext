@@ -8,14 +8,15 @@ import {Checkbox} from '@/components/ui/checkbox';
 import {Slider} from '@/components/ui/slider';
 import {categories,colors,type Piece} from '@/lib/wardrobe';
 import {processPhoto,type PhotoResult} from '@/lib/photo';
-import {photoSource} from '@/lib/client';
+import {displayPhotoSource,onPhotoChange} from '@/lib/photo-display';
 import {recognizeCategory} from '@/lib/category-recognition';
 export function Choice({label,value,options,onChange}:{label:string;value:string;options:readonly string[];onChange:(s:string)=>void}){return <label className="field"><span>{label}</span><Select value={value} onValueChange={onChange}><SelectTrigger className="choice-trigger" aria-label={label}><SelectValue placeholder={"Choose "+label.toLowerCase()}/></SelectTrigger><SelectContent>{options.map(o=><SelectItem key={o} value={o}>{o}</SelectItem>)}</SelectContent></Select></label>}
 export function Toggle({label,checked,onChange,disabled=false}:{label:string;checked:boolean;onChange:(b:boolean)=>void;disabled?:boolean}){return <label className="toggle"><Checkbox disabled={disabled} checked={checked} onCheckedChange={v=>onChange(v===true)}/><span>{label}</span></label>}
 export function PiecePhoto({piece,className=''}:{piece:Piece;className?:string}){
  const [source,setSource]=useState(''),[failed,setFailed]=useState(false),[retry,setRetry]=useState(0);
+ useEffect(()=>onPhotoChange(id=>{if(id===piece.id)setRetry(n=>n+1);}),[piece.id]);
  const node=useRef<HTMLDivElement>(null);const privatePhoto=piece.image.startsWith('wardrobe-photo:');
- useEffect(()=>{let active=true;setSource('');setFailed(false);if(!privatePhoto)return;const observer=new IntersectionObserver(entries=>{if(!entries.some(e=>e.isIntersecting))return;observer.disconnect();void photoSource(piece.id).then(url=>{if(active)setSource(url);}).catch(()=>{if(active)setFailed(true);});},{rootMargin:'250px'});if(node.current)observer.observe(node.current);return()=>{active=false;observer.disconnect();};},[piece.id,piece.image,privatePhoto,retry]);
+ useEffect(()=>{let active=true;setSource('');setFailed(false);if(!privatePhoto)return;const observer=new IntersectionObserver(entries=>{if(!entries.some(e=>e.isIntersecting))return;observer.disconnect();void displayPhotoSource(piece).then(url=>{if(active)setSource(url);}).catch(()=>{if(active)setFailed(true);});},{rootMargin:'250px'});if(node.current)observer.observe(node.current);return()=>{active=false;observer.disconnect();};},[piece.id,piece.image,piece.fingerprint,privatePhoto,retry]);
  if(piece.sample!==undefined)return <div role="img" aria-label={piece.name} className={'piece-photo '+className} style={{backgroundImage:`url(${import.meta.env.BASE_URL}demo-catalog.png)`,backgroundSize:'300% 200%',backgroundPosition:`${(piece.sample%3)*50}% ${piece.sample<3?0:100}%`}}/>;
  if(privatePhoto)return <div ref={node} className={'piece-photo private-photo '+className}>{source?<img src={source} alt={piece.name}/>:failed?<span role="img" aria-label={'Could not load '+piece.name} onClick={e=>{e.stopPropagation();setRetry(n=>n+1);}}>Photo unavailable · tap to retry</span>:<span role="status">Loading photo…</span>}</div>;
  return <img className={'piece-photo '+className} alt={piece.name} src={piece.image} loading="lazy"/>;

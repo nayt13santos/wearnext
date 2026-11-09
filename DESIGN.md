@@ -15,3 +15,6 @@ Purchase scorer: transparent rule-based compatibility and metadata similarity, n
 Demo catalogue is fictional, generated during development. The demo never persists into the user's wardrobe. Asset public/demo-catalog.png is a 3×2 image atlas. No generative AI service is called by the app.
 
 Connection screen: preserve the pine palette and humanist type. Put Google connection fields first in Settings for an unconnected device, in a single left-aligned panel: storage explanation, deployment link, private key, Connect this device. Keep the outfit board as the main visual. No new marketing hero or separate login brand.
+
+
+Wardrobe cleanup: one entry point combines color correction and photo presentation. A conservative on-device cutout is centered and fitted to the same white square; manual Smaller / Auto fit / Larger choices never crop the garment. Show original and Restore original remain available. Existing-photo choices persist on this device without storing private image bytes or changing Drive originals. Uncertain cutouts require acceptance. Processing is sequential and errors in one phase do not repeat a successful save in the other phase.
